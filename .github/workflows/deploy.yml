@@ -24,7 +24,7 @@ jobs:
           channel: stable
 
       - run: flutter pub get
-      - run: flutter build web --release --base-href "/app-test/"
+      - run: flutter build web --release --base-href "/magalu_prototype/"
 
       - uses: actions/upload-pages-artifact@v3
         with:
