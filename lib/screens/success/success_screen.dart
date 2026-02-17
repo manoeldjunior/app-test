@@ -232,6 +232,16 @@ class _SuccessScreenState extends ConsumerState<SuccessScreen>
         return 'Carnê Digital';
       case PaymentMethod.boleto:
         return 'Boleto';
+      case PaymentMethod.mercadoPagoBalance:
+        return 'Mercado Pago';
+      case PaymentMethod.creditLine:
+        return 'Linha de Crédito';
+      case PaymentMethod.meliDolar:
+        return 'Meli Dólar';
+      case PaymentMethod.nubankBalance:
+        return 'Saldo Nubank';
+      case PaymentMethod.nubankCredit:
+        return 'Crédito Nubank';
       case null:
         return '-';
     }

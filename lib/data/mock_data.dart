@@ -12,7 +12,48 @@ class MockData {
     carneDigitalLimit: 6638.80,
     carneDigitalUsed: 1200.00,
     creditScore: 742,
+    // Mercado Pago
+    mercadoPagoBalance: 18641.95,
+    creditLineAvailable: 35860.00,
+    creditLineMaxInstallments: 36,
+    meliDolarBalance: 4.92,
+    // Nubank
+    nubankBalance: 6789.27,
+    nubankCreditLimit: 12000.00,
+    nubankCreditUsed: 2298.94,
+    nubankTier: 'Ultravioleta',
   );
+
+  // ─── Bank Cards (for ML-style payment) ─────────────────
+  static const bankCards = <BankCard>[
+    BankCard(brand: 'Nubank', lastFour: '9839', network: 'mastercard', brandColor: Color(0xFF820AD1)),
+    BankCard(brand: 'C6 BANK', lastFour: '1611', network: 'mastercard', brandColor: Color(0xFFFF5722)),
+    BankCard(brand: 'Itaú', lastFour: '6636', network: 'mastercard', brandColor: Color(0xFFFF5722)),
+    BankCard(brand: 'Mastercard', lastFour: '5421', network: 'mastercard', brandColor: Color(0xFFFF5722)),
+  ];
+
+  // ─── Installment Calculator ────────────────────────────
+  static List<InstallmentOption> calculateInstallments(double basePrice) {
+    const rates = <int, double>{
+      1: 0.0385,
+      2: 0.065,
+      3: 0.089,
+      4: 0.115,
+      5: 0.141,
+      6: 0.167,
+      10: 0.277,
+      12: 0.334,
+    };
+    return rates.entries.map((e) {
+      final total = basePrice * (1 + e.value);
+      return InstallmentOption(
+        count: e.key,
+        perInstallment: total / e.key,
+        total: total,
+        hasInterest: e.key > 1,
+      );
+    }).toList();
+  }
 
   // ─── Products ──────────────────────────────────────────
   static const products = <Product>[

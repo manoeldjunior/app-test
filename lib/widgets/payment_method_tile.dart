@@ -28,6 +28,16 @@ class PaymentMethodTile extends StatelessWidget {
         return Icons.receipt_long;
       case PaymentMethod.boleto:
         return Icons.description;
+      case PaymentMethod.mercadoPagoBalance:
+        return Icons.account_balance_wallet;
+      case PaymentMethod.creditLine:
+        return Icons.credit_score;
+      case PaymentMethod.meliDolar:
+        return Icons.monetization_on;
+      case PaymentMethod.nubankBalance:
+        return Icons.account_balance;
+      case PaymentMethod.nubankCredit:
+        return Icons.credit_card;
     }
   }
 
@@ -43,6 +53,16 @@ class PaymentMethodTile extends StatelessWidget {
         return AppColors.magaluPay;
       case PaymentMethod.boleto:
         return AppColors.textSecondary;
+      case PaymentMethod.mercadoPagoBalance:
+        return const Color(0xFF009EE3);
+      case PaymentMethod.creditLine:
+        return const Color(0xFFFFE600);
+      case PaymentMethod.meliDolar:
+        return const Color(0xFF00A650);
+      case PaymentMethod.nubankBalance:
+        return const Color(0xFF820AD1);
+      case PaymentMethod.nubankCredit:
+        return const Color(0xFF820AD1);
     }
   }
 

@@ -1,10 +1,9 @@
 // ═══════════════════════════════════════════════════════════
-// V3 — Magalu × Nubank (Premium Polish)
+// V3 — Nubank Experience (Black/Purple, NuPay)
 // ═══════════════════════════════════════════════════════════
-// Nubank-level refinement: soft shadows, generous whitespace,
-// micro-interactions (PressableScale), animated transitions,
-// floating balance card, banner carousel, confetti success.
-// Adapted from the standalone app to use Navigator.
+// Pixel-perfect replica of the Nubank checkout + NuPay
+// payment screens from the provided screenshots.
+// Dark theme, purple accents, minimalist typography.
 // ═══════════════════════════════════════════════════════════
 
 import 'dart:math';
@@ -17,25 +16,38 @@ import '../data/mock_data.dart';
 import '../providers/providers.dart';
 import '../utils/currency_format.dart';
 
-// ─── Colors ──────────────────────────────────────────────
+// ─── Nubank Colors (from screenshots) ────────────────────
 class _C {
-  static const primary = Color(0xFF0086FF);
-  static const primaryDark = Color(0xFF0060CC);
-  static const surface = Colors.white;
-  static const bg = Color(0xFFF8F8F8);
+  static const purple = Color(0xFF820AD1);
+  static const purpleDark = Color(0xFF6B07AE);
+  static const purpleLight = Color(0xFF9B3FDB);
+  static const bg = Color(0xFF111111);
+  static const surface = Color(0xFF1A1A1A);
+  static const card = Color(0xFF222222);
+  static const cardLight = Color(0xFF2A2A2A);
+  static const cardBorder = Color(0xFF333333);
+  static const textPrimary = Color(0xFFFFFFFF);
+  static const textSecondary = Color(0xFFAAAAAA);
+  static const textTertiary = Color(0xFF777777);
   static const green = Color(0xFF00A650);
-  static const greenLight = Color(0xFFE8F5E9);
-  static const orange = Color(0xFFFF6F00);
-  static const orangeLight = Color(0xFFFFF3E0);
-  static const pix = Color(0xFF00BDAE);
-  static const text = Color(0xFF1A1A1A);
-  static const textSec = Color(0xFF757575);
-  static const textTer = Color(0xFFBDBDBD);
-  static const border = Color(0xFFEEEEEE);
-  static const divider = Color(0xFFE0E0E0);
+  static const greenLight = Color(0xFF1A3A2A);
+  static const red = Color(0xFFFF4444);
   static const star = Color(0xFFFFC107);
-  static const shadow = Color(0x0D000000);
-  static const shadowMed = Color(0x1A000000);
+  static const pix = Color(0xFF00BDAE);
+}
+
+TextStyle _nu({
+  double size = 14,
+  FontWeight weight = FontWeight.w400,
+  Color color = _C.textPrimary,
+  double? height,
+}) {
+  return GoogleFonts.inter(
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+    height: height,
+  );
 }
 
 // ─── Entry Point ─────────────────────────────────────────
@@ -49,47 +61,41 @@ class V3App extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
-          brightness: Brightness.light,
-          primaryColor: _C.primary,
+          brightness: Brightness.dark,
           scaffoldBackgroundColor: _C.bg,
-          colorScheme: const ColorScheme.light(
-            primary: _C.primary,
+          colorScheme: const ColorScheme.dark(
+            primary: _C.purple,
             onPrimary: Colors.white,
-            secondary: _C.orange,
             surface: _C.surface,
-            onSurface: _C.text,
+            onSurface: _C.textPrimary,
           ),
-          textTheme: GoogleFonts.interTextTheme(),
+          textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: _C.bg,
+            foregroundColor: _C.textPrimary,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+          ),
           cardTheme: CardThemeData(
-            color: _C.surface,
+            color: _C.card,
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: _C.primary,
+              backgroundColor: _C.purple,
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(30),
               ),
               textStyle: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
-            ),
-          ),
-          outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: _C.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              side: const BorderSide(color: _C.primary, width: 1.5),
             ),
           ),
         ),
@@ -111,15 +117,18 @@ class _Press extends StatefulWidget {
 class _PressState extends State<_Press> with SingleTickerProviderStateMixin {
   late final AnimationController _c;
   late final Animation<double> _s;
+
   @override
   void initState() {
     super.initState();
     _c = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 100),
-        reverseDuration: const Duration(milliseconds: 200));
-    _s = Tween(begin: 1.0, end: 0.96)
-        .animate(CurvedAnimation(parent: _c, curve: Curves.easeInOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 200),
+    );
+    _s = Tween(begin: 1.0, end: 0.96).animate(
+      CurvedAnimation(parent: _c, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -143,7 +152,7 @@ class _PressState extends State<_Press> with SingleTickerProviderStateMixin {
 }
 
 // ═════════════════════════════════════════════════════════
-// HOME
+// HOME — Nubank dark style with credit indicators
 // ═════════════════════════════════════════════════════════
 class _Home extends ConsumerWidget {
   const _Home();
@@ -159,13 +168,12 @@ class _Home extends ConsumerWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // ─── Sliver App Bar ──────────────────────────
           SliverAppBar(
             expandedHeight: 110,
             floating: true,
             pinned: true,
-            backgroundColor: _C.primary,
-            surfaceTintColor: _C.primary,
+            backgroundColor: _C.purple,
+            surfaceTintColor: _C.purple,
             leading: IconButton(
               onPressed: () {},
               icon: const CircleAvatar(
@@ -177,16 +185,16 @@ class _Home extends ConsumerWidget {
             actions: [
               IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.notifications_outlined,
-                    color: Colors.white),
+                icon: const Icon(Icons.visibility_outlined, color: Colors.white),
               ),
               Stack(
                 children: [
                   IconButton(
-                    onPressed: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const _Cart())),
-                    icon: const Icon(Icons.shopping_bag_outlined,
-                        color: Colors.white),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const _Cart()),
+                    ),
+                    icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
                   ),
                   if (cartCount > 0)
                     Positioned(
@@ -194,16 +202,9 @@ class _Home extends ConsumerWidget {
                       top: 6,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: _C.orange,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                            minWidth: 18, minHeight: 18),
-                        child: Text('$cartCount',
-                            style: GoogleFonts.inter(
-                                color: Colors.white, fontSize: 10),
-                            textAlign: TextAlign.center),
+                        decoration: const BoxDecoration(color: _C.red, shape: BoxShape.circle),
+                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                        child: Text('$cartCount', style: _nu(size: 10), textAlign: TextAlign.center),
                       ),
                     ),
                 ],
@@ -212,23 +213,21 @@ class _Home extends ConsumerWidget {
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                color: _C.primary,
+                color: _C.purple,
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(22),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, color: _C.textSec, size: 20),
+                      const Icon(Icons.search, color: Colors.white70, size: 20),
                       const SizedBox(width: 10),
-                      Text('Busca no Magalu',
-                          style: GoogleFonts.inter(
-                              color: _C.textTer, fontSize: 14)),
+                      Text('Buscar no Shopping', style: _nu(size: 14, color: Colors.white70)),
                     ],
                   ),
                 ),
@@ -236,20 +235,15 @@ class _Home extends ConsumerWidget {
             ),
           ),
 
-          // ─── Balance Card ──────────────────────────────
+          // Balance / Credit Card
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: _C.surface,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                      color: _C.shadowMed,
-                      blurRadius: 16,
-                      offset: const Offset(0, 4)),
-                ],
+                color: _C.card,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: _C.cardBorder, width: 0.5),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,20 +251,12 @@ class _Home extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Saldo MagaluPay',
-                          style: GoogleFonts.inter(
-                              color: _C.textSec,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600)),
+                      Text('Conta', style: _nu(size: 14, weight: FontWeight.w600, color: _C.textSecondary)),
                       GestureDetector(
-                        onTap: () => ref
-                            .read(userProvider.notifier)
-                            .toggleBalanceVisibility(),
+                        onTap: () => ref.read(userProvider.notifier).toggleBalanceVisibility(),
                         child: Icon(
-                          userState.balanceVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: _C.textSec,
+                          userState.balanceVisible ? Icons.visibility : Icons.visibility_off,
+                          color: _C.textSecondary,
                           size: 22,
                         ),
                       ),
@@ -278,23 +264,50 @@ class _Home extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    userState.balanceVisible
-                        ? CurrencyFormat.format(user.magaluPayBalance)
-                        : r'R$ ••••••',
-                    style: GoogleFonts.inter(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: _C.text),
+                    userState.balanceVisible ? CurrencyFormat.format(user.nubankBalance) : r'R$ ••••••',
+                    style: _nu(size: 28, weight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 16),
+                  // Credit indicator (top of funnel)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _C.purple.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: _C.purple.withValues(alpha: 0.3), width: 0.5),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.credit_card, color: _C.purpleLight, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Limite disponível', style: _nu(size: 11, color: _C.textSecondary)),
+                              Text(
+                                CurrencyFormat.format(user.nubankCreditAvailable),
+                                style: _nu(size: 15, weight: FontWeight.w600, color: _C.purpleLight),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(color: _C.purple, borderRadius: BorderRadius.circular(12)),
+                          child: Text('Até 24x', style: _nu(size: 10, weight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 14),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _QuickAction(Icons.account_balance_wallet, 'Saldo',
-                          _C.primary),
-                      _QuickAction(Icons.pix, 'Pix', _C.pix),
-                      _QuickAction(Icons.receipt_long, 'Carnê', _C.orange),
-                      _QuickAction(Icons.swap_horiz, 'Transferir', _C.primary),
+                      _QuickAct(Icons.pix, 'Pix', _C.pix),
+                      _QuickAct(Icons.receipt_long, 'Pagar', _C.purple),
+                      _QuickAct(Icons.swap_horiz, 'Transferir', _C.purpleLight),
+                      _QuickAct(Icons.credit_card, 'Cartão', _C.purple),
                     ],
                   ),
                 ],
@@ -302,147 +315,76 @@ class _Home extends ConsumerWidget {
             ),
           ),
 
-          // ─── Banner ────────────────────────────────────
+          // Shopping do Nu Banner
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              height: 140,
+              height: 120,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                      color: _C.shadowMed,
-                      blurRadius: 12,
-                      offset: const Offset(0, 4)),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: MockData.banners.first.imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) =>
-                          Container(color: Colors.grey[200]),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.6),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 14,
-                      left: 14,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Oferta do Dia',
-                              style: GoogleFonts.inter(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600)),
-                          Text('Até 50% OFF em Eletrônicos',
-                              style: GoogleFonts.inter(
-                                  color: Colors.white70, fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                  ],
+                gradient: const LinearGradient(
+                  colors: [_C.purple, _C.purpleDark],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
-            ),
-          ),
-
-          // ─── Categories ────────────────────────────────
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Text('Categorias',
-                  style: GoogleFonts.inter(
-                      fontSize: 18, fontWeight: FontWeight.w600)),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 90,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: MockData.categories.length,
-                itemBuilder: (context, i) {
-                  final cat = MockData.categories[i];
-                  return _Press(
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -20,
+                    top: -20,
                     child: Container(
-                      width: 68,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: _C.primary.withOpacity(0.08),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: _C.primary.withOpacity(0.15),
-                                  width: 1.5),
-                            ),
-                            child: Icon(cat.icon,
-                                color: _C.primary, size: 24),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(cat.name,
-                              style: GoogleFonts.inter(
-                                  fontSize: 10, color: _C.textSec),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                        ],
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
-                  );
-                },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Shopping do Nu', style: _nu(size: 18, weight: FontWeight.w700)),
+                        const SizedBox(height: 4),
+                        Text('Parcele em até 24x no crédito', style: _nu(size: 13, color: Colors.white70)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          // ─── Products ──────────────────────────────────
+          // Products
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Text('Recomendados para você',
-                  style: GoogleFonts.inter(
-                      fontSize: 18, fontWeight: FontWeight.w600)),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text('Para você', style: _nu(size: 18, weight: FontWeight.w600)),
             ),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) {
                 final p = MockData.products[i];
-                return _ProductCard(product: p, onAddToCart: () {
-                  ref.read(cartProvider.notifier).addItem(p);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${p.brand} adicionado à sacola',
-                          style: const TextStyle(color: Colors.white)),
-                      backgroundColor: _C.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      margin: const EdgeInsets.all(16),
-                    ),
-                  );
-                });
+                return _ProductCard(
+                  product: p,
+                  onAddToCart: () {
+                    ref.read(cartProvider.notifier).addItem(p);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${p.brand} adicionado', style: const TextStyle(color: Colors.white)),
+                        backgroundColor: _C.purple,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        margin: const EdgeInsets.all(16),
+                      ),
+                    );
+                  },
+                );
               },
               childCount: MockData.products.length,
             ),
@@ -455,11 +397,12 @@ class _Home extends ConsumerWidget {
   }
 }
 
-class _QuickAction extends StatelessWidget {
+class _QuickAct extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  const _QuickAction(this.icon, this.label, this.color);
+  const _QuickAct(this.icon, this.label, this.color);
+
   @override
   Widget build(BuildContext context) {
     return _Press(
@@ -470,14 +413,13 @@ class _QuickAction extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 22),
+            child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(height: 4),
-          Text(label,
-              style: GoogleFonts.inter(fontSize: 10, color: _C.textSec)),
+          Text(label, style: _nu(size: 10, color: _C.textSecondary)),
         ],
       ),
     );
@@ -487,17 +429,13 @@ class _QuickAction extends StatelessWidget {
 class _BottomNav extends StatelessWidget {
   final int cartCount;
   const _BottomNav({required this.cartCount});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: _C.surface,
-        boxShadow: [
-          BoxShadow(
-              color: _C.shadowMed,
-              blurRadius: 20,
-              offset: const Offset(0, -4)),
-        ],
+        border: const Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
       ),
       child: SafeArea(
         child: Padding(
@@ -505,30 +443,26 @@ class _BottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(Icons.home, 'Início', true),
-              _NavItem(Icons.search, 'Buscar', false),
+              _NI(Icons.home, 'Início', true),
+              _NI(Icons.credit_card, 'Cartão', false),
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  _NavItem(Icons.shopping_bag_outlined, 'Sacola', false),
+                  _NI(Icons.shopping_bag_outlined, 'Shopping', false),
                   if (cartCount > 0)
                     Positioned(
                       right: 2,
                       top: -2,
                       child: Container(
                         padding: const EdgeInsets.all(3),
-                        decoration: const BoxDecoration(
-                            color: _C.orange, shape: BoxShape.circle),
-                        child: Text('$cartCount',
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 8)),
+                        decoration: const BoxDecoration(color: _C.purple, shape: BoxShape.circle),
+                        child: Text('$cartCount', style: _nu(size: 8)),
                       ),
                     ),
                 ],
               ),
-              _NavItem(Icons.account_balance_wallet_outlined, 'MagaluPay',
-                  false),
-              _NavItem(Icons.person_outline, 'Perfil', false),
+              _NI(Icons.pix, 'Pix', false),
+              _NI(Icons.person_outline, 'Perfil', false),
             ],
           ),
         ),
@@ -537,29 +471,33 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
+class _NI extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool active;
-  const _NavItem(this.icon, this.label, this.active);
+  const _NI(this.icon, this.label, this.active);
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon,
-            color: active ? _C.primary : _C.textSec, size: 24),
+        Icon(icon, color: active ? _C.purple : _C.textTertiary, size: 24),
         const SizedBox(height: 2),
-        Text(label,
-            style: TextStyle(
-                fontSize: 10,
-                fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                color: active ? _C.primary : _C.textSec)),
+        Text(
+          label,
+          style: _nu(
+            size: 10,
+            weight: active ? FontWeight.w600 : FontWeight.w400,
+            color: active ? _C.purple : _C.textTertiary,
+          ),
+        ),
       ],
     );
   }
 }
 
+// ─── Product Card ────────────────────────────────────────
 class _ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback? onAddToCart;
@@ -567,38 +505,32 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = MockData.user;
     return _Press(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (_) => _ProductDetail(product: product)),
+        MaterialPageRoute(builder: (_) => _ProductDetail(product: product)),
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: _C.surface,
+          color: _C.card,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-                color: _C.shadow, blurRadius: 12, offset: const Offset(0, 2)),
-          ],
+          border: Border.all(color: _C.cardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image + badges
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CachedNetworkImage(
                     imageUrl: product.imageUrl,
                     height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) =>
-                        Container(color: Colors.grey[100], height: 180),
+                    placeholder: (_, __) => Container(color: _C.cardLight, height: 180),
                   ),
                 ),
                 if (product.discountPercent > 0)
@@ -606,95 +538,64 @@ class _ProductCard extends StatelessWidget {
                     top: 12,
                     left: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _C.green,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text('${product.discountPercent}% OFF',
-                          style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: _C.purple, borderRadius: BorderRadius.circular(20)),
+                      child: Text('${product.discountPercent}% OFF', style: _nu(size: 11, weight: FontWeight.w700)),
                     ),
                   ),
               ],
             ),
-            // Details
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name,
-                      style: GoogleFonts.inter(
-                          fontSize: 14, fontWeight: FontWeight.w600),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 6),
-                  // Rating
-                  Row(
-                    children: [
-                      ...List.generate(
-                        5,
-                        (i) => Icon(
-                          i < product.rating.floor()
-                              ? Icons.star
-                              : (i < product.rating
-                                  ? Icons.star_half
-                                  : Icons.star_border),
-                          color: _C.star,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text('${product.rating}',
-                          style: GoogleFonts.inter(
-                              fontSize: 11, color: _C.textSec)),
-                    ],
-                  ),
+                  Text(product.name, style: _nu(size: 14, weight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
                   if (product.originalPrice != null)
-                    Text(CurrencyFormat.format(product.originalPrice!),
-                        style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: _C.textTer,
-                            decoration: TextDecoration.lineThrough)),
+                    Text(
+                      CurrencyFormat.format(product.originalPrice!),
+                      style: _nu(size: 12, color: _C.textTertiary).copyWith(decoration: TextDecoration.lineThrough),
+                    ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(CurrencyFormat.format(product.price),
-                          style: GoogleFonts.inter(
-                              fontSize: 20, fontWeight: FontWeight.w700)),
+                      Text(CurrencyFormat.format(product.price), style: _nu(size: 20, weight: FontWeight.w700)),
                       if (product.maxInstallments > 1) ...[
                         const SizedBox(width: 8),
                         Text(
-                            'em até ${product.maxInstallments}x de ${CurrencyFormat.format(product.installmentPrice)}',
-                            style: GoogleFonts.inter(
-                                fontSize: 11, color: _C.textSec)),
+                          'em até ${product.maxInstallments}x de ${CurrencyFormat.format(product.installmentPrice)}',
+                          style: _nu(size: 11, color: _C.textSecondary),
+                        ),
                       ],
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  if (product.freeShipping)
-                    Row(
-                      children: [
-                        const Icon(Icons.local_shipping,
-                            color: _C.green, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                            'Chegará grátis ${product.deliveryDate ?? ""}',
-                            style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: _C.green,
-                                fontWeight: FontWeight.w500)),
-                      ],
+                  // Credit indicator on product card (top of funnel)
+                  if (user.nubankCreditAvailable >= product.price)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _C.purple.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.credit_card, color: _C.purpleLight, size: 12),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Parcele em até 24x no crédito',
+                              style: _nu(size: 10, color: _C.purpleLight, weight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                 ],
               ),
             ),
-            // Add to cart
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
               child: SizedBox(
@@ -702,13 +603,12 @@ class _ProductCard extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onAddToCart,
                   icon: const Icon(Icons.add_shopping_cart, size: 18),
-                  label: const Text('Adicionar à sacola'),
+                  label: const Text('Adicionar'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _C.green,
+                    backgroundColor: _C.purple,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
                 ),
               ),
@@ -729,6 +629,7 @@ class _ProductDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = MockData.user;
     return Scaffold(
       backgroundColor: _C.bg,
       body: CustomScrollView(
@@ -738,21 +639,17 @@ class _ProductDetail extends ConsumerWidget {
             expandedHeight: 300,
             pinned: true,
             backgroundColor: _C.surface,
-            foregroundColor: _C.text,
+            foregroundColor: _C.textPrimary,
             leading: Padding(
               padding: const EdgeInsets.all(8),
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: _C.card.withValues(alpha: 0.9),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.1), blurRadius: 8),
-                    ],
                   ),
-                  child: const Icon(Icons.arrow_back, color: _C.text),
+                  child: const Icon(Icons.arrow_back, color: _C.textPrimary),
                 ),
               ),
             ),
@@ -764,32 +661,22 @@ class _ProductDetail extends ConsumerWidget {
                     width: double.infinity,
                     height: double.infinity,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) =>
-                        Container(color: Colors.grey[100]),
+                    placeholder: (_, __) => Container(color: _C.cardLight),
                   ),
                   if (product.discountPercent > 0)
                     Positioned(
                       top: 100,
                       left: 16,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _C.green,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text('${product.discountPercent}% OFF',
-                            style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700)),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: _C.purple, borderRadius: BorderRadius.circular(20)),
+                        child: Text('${product.discountPercent}% OFF', style: _nu(size: 12, weight: FontWeight.w700)),
                       ),
                     ),
                 ],
               ),
             ),
           ),
-          // Product info
           SliverToBoxAdapter(
             child: Container(
               color: _C.surface,
@@ -797,41 +684,21 @@ class _ProductDetail extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.brand.toUpperCase(),
-                      style: GoogleFonts.inter(
-                          color: _C.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.2)),
+                  Text(product.brand.toUpperCase(), style: _nu(size: 12, weight: FontWeight.w500, color: _C.purple).copyWith(letterSpacing: 1.2)),
                   const SizedBox(height: 6),
-                  Text(product.name,
-                      style: GoogleFonts.inter(
-                          fontSize: 20, fontWeight: FontWeight.w600)),
+                  Text(product.name, style: _nu(size: 20, weight: FontWeight.w600)),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      ...List.generate(
-                        5,
-                        (i) => Icon(
-                          i < product.rating.floor()
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: _C.star,
-                          size: 18,
-                        ),
-                      ),
+                      ...List.generate(5, (i) => Icon(i < product.rating.floor() ? Icons.star : Icons.star_border, color: _C.star, size: 18)),
                       const SizedBox(width: 8),
-                      Text(
-                          '${product.rating} (${product.reviewCount} avaliações)',
-                          style: GoogleFonts.inter(
-                              fontSize: 12, color: _C.textSec)),
+                      Text('${product.rating} (${product.reviewCount})', style: _nu(size: 12, color: _C.textSecondary)),
                     ],
                   ),
                 ],
               ),
             ),
           ),
-          // Price
           SliverToBoxAdapter(
             child: Container(
               color: _C.surface,
@@ -839,35 +706,24 @@ class _ProductDetail extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Divider(height: 24),
+                  const Divider(height: 24, color: _C.cardBorder),
                   if (product.originalPrice != null)
-                    Text('De ${CurrencyFormat.format(product.originalPrice!)}',
-                        style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: _C.textTer,
-                            decoration: TextDecoration.lineThrough)),
+                    Text(
+                      'De ${CurrencyFormat.format(product.originalPrice!)}',
+                      style: _nu(size: 14, color: _C.textTertiary).copyWith(decoration: TextDecoration.lineThrough),
+                    ),
                   const SizedBox(height: 4),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(CurrencyFormat.format(product.price),
-                          style: GoogleFonts.inter(
-                              fontSize: 24, fontWeight: FontWeight.w700)),
+                      Text(CurrencyFormat.format(product.price), style: _nu(size: 28, weight: FontWeight.w700)),
                       if (product.discountPercent > 0) ...[
                         const SizedBox(width: 10),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: _C.greenLight,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text('-${product.discountPercent}%',
-                              style: GoogleFonts.inter(
-                                  color: _C.green,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(color: _C.greenLight, borderRadius: BorderRadius.circular(6)),
+                          child: Text('-${product.discountPercent}%', style: _nu(size: 11, weight: FontWeight.w700, color: _C.green)),
                         ),
                       ],
                     ],
@@ -875,30 +731,33 @@ class _ProductDetail extends ConsumerWidget {
                   if (product.maxInstallments > 1) ...[
                     const SizedBox(height: 6),
                     Text(
-                        'em até ${product.maxInstallments}x de ${CurrencyFormat.format(product.installmentPrice)} sem juros',
-                        style: GoogleFonts.inter(
-                            fontSize: 14, color: _C.textSec)),
+                      'em até ${product.maxInstallments}x de ${CurrencyFormat.format(product.installmentPrice)} sem juros',
+                      style: _nu(size: 14, color: _C.textSecondary),
+                    ),
                   ],
-                  // Cashback
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _C.orangeLight,
+                      color: _C.purple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _C.purple.withValues(alpha: 0.25), width: 0.5),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.account_balance_wallet,
-                            color: _C.orange, size: 20),
-                        const SizedBox(width: 8),
+                        const Icon(Icons.credit_card, color: _C.purple, size: 22),
+                        const SizedBox(width: 10),
                         Expanded(
-                          child: Text(
-                              'Ganhe ${CurrencyFormat.format(product.price * 0.05)} de cashback com MagaluPay',
-                              style: GoogleFonts.inter(
-                                  color: _C.orange,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Crédito pré-aprovado disponível', style: _nu(size: 12, weight: FontWeight.w600, color: _C.purpleLight)),
+                              Text(
+                                '${CurrencyFormat.format(user.nubankCreditAvailable)} de limite \u2022 Até 24x',
+                                style: _nu(size: 11, color: _C.textSecondary),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -907,7 +766,6 @@ class _ProductDetail extends ConsumerWidget {
               ),
             ),
           ),
-          // Shipping
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.only(top: 8),
@@ -917,31 +775,18 @@ class _ProductDetail extends ConsumerWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: _C.greenLight,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.local_shipping,
-                        color: _C.green, size: 24),
+                    decoration: BoxDecoration(color: _C.greenLight, borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.local_shipping, color: _C.green, size: 24),
                   ),
                   const SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          product.freeShipping
-                              ? 'Frete Grátis'
-                              : 'Frete a calcular',
-                          style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: product.freeShipping
-                                  ? _C.green
-                                  : _C.text)),
-                      if (product.deliveryDate != null)
-                        Text('Chegará ${product.deliveryDate}',
-                            style: GoogleFonts.inter(
-                                fontSize: 12, color: _C.textSec)),
+                        product.freeShipping ? 'Frete Grátis' : 'Frete a calcular',
+                        style: _nu(size: 14, weight: FontWeight.w600, color: product.freeShipping ? _C.green : _C.textPrimary),
+                      ),
+                      if (product.deliveryDate != null) Text('Chegará ${product.deliveryDate}', style: _nu(size: 12, color: _C.textSecondary)),
                     ],
                   ),
                 ],
@@ -953,14 +798,9 @@ class _ProductDetail extends ConsumerWidget {
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: _C.surface,
-          boxShadow: [
-            BoxShadow(
-                color: _C.shadowMed,
-                blurRadius: 20,
-                offset: const Offset(0, -4)),
-          ],
+          border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
         ),
         child: Row(
           children: [
@@ -970,11 +810,10 @@ class _ProductDetail extends ConsumerWidget {
                   ref.read(cartProvider.notifier).addItem(product);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('${product.brand} adicionado à sacola'),
-                      backgroundColor: _C.green,
+                      content: Text('${product.brand} adicionado'),
+                      backgroundColor: _C.purple,
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       margin: const EdgeInsets.all(16),
                     ),
                   );
@@ -982,7 +821,11 @@ class _ProductDetail extends ConsumerWidget {
                 icon: const Icon(Icons.add_shopping_cart, size: 18),
                 label: const Text('Adicionar'),
                 style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14)),
+                  foregroundColor: _C.purple,
+                  side: const BorderSide(color: _C.purple),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -991,11 +834,9 @@ class _ProductDetail extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () {
                   ref.read(cartProvider.notifier).addItem(product);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const _Cart()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const _Cart()));
                 },
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14)),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                 child: const Text('Comprar agora'),
               ),
             ),
@@ -1021,27 +862,19 @@ class _Cart extends ConsumerWidget {
       backgroundColor: _C.bg,
       appBar: AppBar(
         backgroundColor: _C.surface,
-        foregroundColor: _C.text,
+        foregroundColor: _C.textPrimary,
         elevation: 0,
-        title: Text('Sacola', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: Text('Sacola', style: _nu(size: 20, weight: FontWeight.w600)),
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
       ),
       body: items.isEmpty
           ? Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.shopping_bag_outlined,
-                      size: 64, color: _C.textTer.withOpacity(0.5)),
+                  Icon(Icons.shopping_bag_outlined, size: 64, color: _C.textTertiary.withValues(alpha: 0.5)),
                   const SizedBox(height: 16),
-                  Text('Sua sacola está vazia',
-                      style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: _C.textSec)),
+                  Text('Sua sacola está vazia', style: _nu(size: 18, weight: FontWeight.w600, color: _C.textSecondary)),
                 ],
               ),
             )
@@ -1051,56 +884,34 @@ class _Cart extends ConsumerWidget {
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.only(top: 8),
-                    children: items
-                        .map((item) => _CartItemCard(
-                              item: item,
-                              onRemove: () => ref
-                                  .read(cartProvider.notifier)
-                                  .removeItem(item.product.id),
-                              onQty: (q) => ref
-                                  .read(cartProvider.notifier)
-                                  .updateQuantity(item.product.id, q),
-                            ))
-                        .toList(),
+                    children: items.map((item) => _CartItemCard(
+                      item: item,
+                      onRemove: () => ref.read(cartProvider.notifier).removeItem(item.product.id),
+                      onQty: (q) => ref.read(cartProvider.notifier).updateQuantity(item.product.id, q),
+                    )).toList(),
                   ),
                 ),
-                // Total + CTA
                 Container(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: _C.surface,
-                    boxShadow: [
-                      BoxShadow(
-                          color: _C.shadowMed,
-                          blurRadius: 20,
-                          offset: const Offset(0, -4)),
-                    ],
+                    border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
                   ),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Total',
-                              style: GoogleFonts.inter(
-                                  fontSize: 18, fontWeight: FontWeight.w600)),
-                          Text(CurrencyFormat.format(total),
-                              style: GoogleFonts.inter(
-                                  fontSize: 22, fontWeight: FontWeight.w700)),
+                          Text('Total', style: _nu(size: 18, weight: FontWeight.w600)),
+                          Text(CurrencyFormat.format(total), style: _nu(size: 22, weight: FontWeight.w700)),
                         ],
                       ),
                       const SizedBox(height: 14),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const _Checkout()),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16)),
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const _NuCheckout())),
+                          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                           child: const Text('Continuar'),
                         ),
                       ),
@@ -1117,8 +928,7 @@ class _CartItemCard extends StatelessWidget {
   final CartItem item;
   final VoidCallback onRemove;
   final ValueChanged<int> onQty;
-  const _CartItemCard(
-      {required this.item, required this.onRemove, required this.onQty});
+  const _CartItemCard({required this.item, required this.onRemove, required this.onQty});
 
   @override
   Widget build(BuildContext context) {
@@ -1130,91 +940,51 @@ class _CartItemCard extends StatelessWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(16),
-        ),
+        decoration: BoxDecoration(color: _C.red, borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.delete, color: Colors.white, size: 28),
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: _C.surface,
+          color: _C.card,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-                color: _C.shadow, blurRadius: 8, offset: const Offset(0, 2)),
-          ],
+          border: Border.all(color: _C.cardBorder, width: 0.5),
         ),
         child: Row(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
-                imageUrl: item.product.imageUrl,
-                width: 72,
-                height: 72,
-                fit: BoxFit.cover,
-              ),
+              child: CachedNetworkImage(imageUrl: item.product.imageUrl, width: 72, height: 72, fit: BoxFit.cover),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.product.name,
-                      style: GoogleFonts.inter(
-                          fontSize: 13, fontWeight: FontWeight.w600),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
+                  Text(item.product.name, style: _nu(size: 13, weight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
-                  Text(CurrencyFormat.format(item.product.price),
-                      style: GoogleFonts.inter(
-                          fontSize: 16, fontWeight: FontWeight.w700)),
+                  Text(CurrencyFormat.format(item.product.price), style: _nu(size: 16, weight: FontWeight.w700)),
                 ],
               ),
             ),
-            // Quantity controls
             Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: _C.border),
-                borderRadius: BorderRadius.circular(10),
-              ),
+              decoration: BoxDecoration(border: Border.all(color: _C.cardBorder), borderRadius: BorderRadius.circular(10)),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
-                    onTap: () => item.quantity > 1
-                        ? onQty(item.quantity - 1)
-                        : onRemove(),
+                    onTap: () => item.quantity > 1 ? onQty(item.quantity - 1) : onRemove(),
                     child: SizedBox(
                       width: 30,
                       height: 30,
-                      child: Icon(
-                        item.quantity > 1
-                            ? Icons.remove
-                            : Icons.delete_outline,
-                        size: 14,
-                        color: item.quantity > 1 ? _C.textSec : Colors.red,
-                      ),
+                      child: Icon(item.quantity > 1 ? Icons.remove : Icons.delete_outline, size: 14, color: item.quantity > 1 ? _C.textSecondary : _C.red),
                     ),
                   ),
-                  SizedBox(
-                    width: 26,
-                    child: Text('${item.quantity}',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                            fontSize: 13, fontWeight: FontWeight.w600)),
-                  ),
+                  SizedBox(width: 26, child: Text('${item.quantity}', textAlign: TextAlign.center, style: _nu(size: 13, weight: FontWeight.w600))),
                   GestureDetector(
                     onTap: () => onQty(item.quantity + 1),
-                    child: const SizedBox(
-                      width: 30,
-                      height: 30,
-                      child:
-                          Icon(Icons.add, size: 14, color: _C.primary),
-                    ),
+                    child: const SizedBox(width: 30, height: 30, child: Icon(Icons.add, size: 14, color: _C.purple)),
                   ),
                 ],
               ),
@@ -1227,288 +997,432 @@ class _CartItemCard extends StatelessWidget {
 }
 
 // ═════════════════════════════════════════════════════════
-// CHECKOUT (combined checkout + payment)
+// CHECKOUT — "Tudo certo para finalizar seu pedido?"
 // ═════════════════════════════════════════════════════════
-class _Checkout extends ConsumerStatefulWidget {
-  const _Checkout();
-  @override
-  ConsumerState<_Checkout> createState() => _CheckoutState();
-}
-
-class _CheckoutState extends ConsumerState<_Checkout> {
-  PaymentMethod? _selected;
+class _NuCheckout extends ConsumerWidget {
+  const _NuCheckout();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(cartProvider);
     final total = ref.watch(cartTotalProvider);
+    const shipping = 40.91;
+    final grandTotal = total + shipping;
 
     return Scaffold(
       backgroundColor: _C.bg,
-      appBar: AppBar(
-        backgroundColor: _C.surface,
-        foregroundColor: _C.text,
-        elevation: 0,
-        title: Text('Checkout',
-            style: GoogleFonts.inter(
-                fontSize: 20, fontWeight: FontWeight.w600)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            // Items
-            Container(
-              color: _C.surface,
-              padding: const EdgeInsets.all(20),
+      body: Column(
+        children: [
+          // Purple header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            decoration: const BoxDecoration(color: _C.purple),
+            child: SafeArea(
+              bottom: false,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Itens do pedido',
-                      style: GoogleFonts.inter(
-                          fontSize: 18, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 14),
-                  ...items.map((item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 22),
+                      ),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white54, width: 1.5)),
+                        child: const Icon(Icons.help_outline, color: Colors.white54, size: 18),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Tudo certo para\nfinalizar seu pedido?', style: _nu(size: 26, weight: FontWeight.w700, height: 1.2)),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  // Resumo do pedido
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: _C.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _C.cardBorder, width: 0.5),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Resumo do pedido', style: _nu(size: 16, weight: FontWeight.w600)),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: CachedNetworkImage(
-                                imageUrl: item.product.imageUrl,
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.product.name,
-                                      style: GoogleFonts.inter(fontSize: 13),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis),
-                                  Text('Qtd: ${item.quantity}',
-                                      style: GoogleFonts.inter(
-                                          fontSize: 11, color: _C.textSec)),
-                                ],
-                              ),
-                            ),
-                            Text(CurrencyFormat.format(item.total),
-                                style: GoogleFonts.inter(
-                                    fontSize: 14, fontWeight: FontWeight.w600)),
+                            Text('Itens (${items.length})', style: _nu(size: 14, color: _C.textSecondary)),
+                            Text(CurrencyFormat.format(total), style: _nu(size: 14, color: _C.textSecondary)),
                           ],
                         ),
-                      )),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Shipping
-            Container(
-              color: _C.surface,
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: _C.greenLight,
-                      borderRadius: BorderRadius.circular(10),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Frete', style: _nu(size: 14, color: _C.textSecondary)),
+                            Text(CurrencyFormat.format(shipping), style: _nu(size: 14, color: const Color(0xFFCCCC00))),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(height: 1, color: _C.cardBorder),
+                        const SizedBox(height: 16),
+                        Center(child: Text('Você pagará', style: _nu(size: 14, color: _C.textSecondary))),
+                        const SizedBox(height: 4),
+                        Center(child: Text(CurrencyFormat.format(grandTotal), style: _nu(size: 28, weight: FontWeight.w700))),
+                        const SizedBox(height: 4),
+                        Center(child: Text('Parcele em até 24x', style: _nu(size: 13, color: _C.textSecondary))),
+                      ],
                     ),
-                    child: const Icon(Icons.local_shipping,
-                        color: _C.green, size: 20),
                   ),
-                  const SizedBox(width: 12),
-                  Text('Frete Grátis',
-                      style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _C.green)),
-                  const Spacer(),
-                  Text('até 22 de fev',
-                      style:
-                          GoogleFonts.inter(fontSize: 12, color: _C.textSec)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Payment methods
-            Container(
-              color: _C.surface,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Forma de pagamento',
-                      style: GoogleFonts.inter(
-                          fontSize: 18, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 12),
-                  ...[
-                    (PaymentMethod.pix, Icons.pix, 'Pix',
-                        'Aprovação imediata', _C.pix),
-                    (PaymentMethod.creditCard, Icons.credit_card,
-                        'Cartão de Crédito', 'Visa •••• 4321', _C.primary),
-                    (PaymentMethod.magaluPay, Icons.account_balance_wallet,
-                        'Saldo MagaluPay', 'R\$ 1.250,80', _C.orange),
-                  ].map((e) => _Press(
-                        onTap: () => setState(() => _selected = e.$1),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: _selected == e.$1
-                                ? _C.primary.withOpacity(0.05)
-                                : _C.surface,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: _selected == e.$1
-                                  ? _C.primary
-                                  : _C.border,
-                              width: _selected == e.$1 ? 2 : 1,
-                            ),
-                          ),
+                  const SizedBox(height: 16),
+                  // Product items
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: _C.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _C.cardBorder, width: 0.5),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Chegará em 7 dias úteis por ${CurrencyFormat.format(shipping)}', style: _nu(size: 13, color: _C.textSecondary)),
+                        const SizedBox(height: 12),
+                        ...items.map((item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
                           child: Row(
                             children: [
-                              Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: e.$5.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: CachedNetworkImage(
+                                  imageUrl: item.product.imageUrl,
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Container(color: _C.cardLight, width: 56, height: 56),
                                 ),
-                                child:
-                                    Icon(e.$2, color: e.$5, size: 22),
                               ),
-                              const SizedBox(width: 14),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(e.$3,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600)),
-                                    Text(e.$4,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            color: _C.textSec)),
+                                    Text(item.product.name, style: _nu(size: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                    Text('Qtd: ${item.quantity}', style: _nu(size: 11, color: _C.textTertiary)),
                                   ],
                                 ),
                               ),
-                              AnimatedContainer(
-                                duration:
-                                    const Duration(milliseconds: 200),
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: _selected == e.$1
-                                        ? _C.primary
-                                        : _C.textTer,
-                                    width: 2,
-                                  ),
-                                  color: _selected == e.$1
-                                      ? _C.primary
-                                      : Colors.transparent,
-                                ),
-                                child: _selected == e.$1
-                                    ? const Icon(Icons.check,
-                                        color: Colors.white, size: 16)
-                                    : null,
-                              ),
+                              Text(CurrencyFormat.format(item.total), style: _nu(size: 13, weight: FontWeight.w600)),
+                            ],
+                          ),
+                        )),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Delivery address
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: _C.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _C.cardBorder, width: 0.5),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Endereço de entrega', style: _nu(size: 13, color: _C.textSecondary)),
+                              const SizedBox(height: 4),
+                              Text('Rua Topázio, 701', style: _nu(size: 15, weight: FontWeight.w600)),
+                              Text('Complemento', style: _nu(size: 13, color: _C.textTertiary)),
                             ],
                           ),
                         ),
-                      )),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(color: _C.purple.withValues(alpha: 0.15), shape: BoxShape.circle),
+                          child: const Icon(Icons.edit, color: _C.purpleLight, size: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            // Summary
-            Container(
-              color: _C.surface,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  _Sum('Subtotal', CurrencyFormat.format(total)),
-                  const SizedBox(height: 6),
-                  const _Sum('Frete', 'Grátis', color: _C.green),
-                  const Divider(height: 20),
-                  _Sum('Total', CurrencyFormat.format(total), bold: true),
-                ],
-              ),
-            ),
-            const SizedBox(height: 100),
-          ],
-        ),
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-        decoration: BoxDecoration(
-          color: _C.surface,
-          boxShadow: [
-            BoxShadow(
-                color: _C.shadowMed,
-                blurRadius: 20,
-                offset: const Offset(0, -4)),
-          ],
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _selected != null
-                ? () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const _Success()))
-                : null,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              disabledBackgroundColor: _C.divider,
-            ),
-            child: Text(_selected != null
-                ? 'Confirmar pagamento'
-                : 'Selecione o pagamento'),
           ),
-        ),
+          // Bottom bar
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+            decoration: const BoxDecoration(
+              color: _C.surface,
+              border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Total com frete', style: _nu(size: 12, color: _C.textSecondary)),
+                        Text(CurrencyFormat.format(grandTotal), style: _nu(size: 18, weight: FontWeight.w700)),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => _NuPay(total: grandTotal))),
+                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
+                    child: const Text('Ir para pagamento'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _Sum extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color? color;
-  final bool bold;
-  const _Sum(this.label, this.value, {this.color, this.bold = false});
+// ═════════════════════════════════════════════════════════
+// NuPay — Payment Screen (Screenshot 2)
+// ═════════════════════════════════════════════════════════
+class _NuPay extends ConsumerStatefulWidget {
+  final double total;
+  const _NuPay({required this.total});
+  @override
+  ConsumerState<_NuPay> createState() => _NuPayState();
+}
+
+class _NuPayState extends ConsumerState<_NuPay> {
+  String _method = 'credit';
+  int _installments = 1;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label,
-            style: GoogleFonts.inter(
-                fontSize: bold ? 18 : 14,
-                fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
-                color: bold ? _C.text : _C.textSec)),
-        Text(value,
-            style: GoogleFonts.inter(
-                fontSize: bold ? 22 : 14,
-                fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-                color: color ?? _C.text)),
-      ],
+    final user = MockData.user;
+    final total = widget.total;
+
+    final installmentOptions = <int, double>{1: total, 2: total / 2, 3: total / 3, 12: total / 12, 24: total / 24};
+
+    return Scaffold(
+      backgroundColor: _C.bg,
+      body: Column(
+        children: [
+          // Header: NuPay branding
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            decoration: const BoxDecoration(
+              color: _C.surface,
+              border: Border(bottom: BorderSide(color: _C.cardBorder, width: 0.5)),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.close, color: _C.textPrimary, size: 24),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('nu', style: _nu(size: 22, weight: FontWeight.w700, color: _C.purple)),
+                          Text('Pay', style: _nu(size: 22, weight: FontWeight.w300)),
+                        ],
+                      ),
+                      const SizedBox(width: 24),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text('Pagando', style: _nu(size: 16, color: _C.textSecondary)),
+                  Text(CurrencyFormat.format(total), style: _nu(size: 32, weight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  RichText(
+                    text: TextSpan(
+                      style: _nu(size: 14, color: _C.textSecondary),
+                      children: [
+                        const TextSpan(text: 'para '),
+                        TextSpan(text: 'Shopping do Nu', style: _nu(size: 14, weight: FontWeight.w600, color: _C.textSecondary)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Payment Methods
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  // Balance option
+                  _Press(
+                    onTap: () => setState(() => _method = 'balance'),
+                    child: Row(
+                      children: [
+                        _RadioDot(selected: _method == 'balance'),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('À vista com saldo da conta', style: _nu(size: 15, weight: FontWeight.w500)),
+                              Text('${CurrencyFormat.format(user.nubankBalance)} de saldo disponível', style: _nu(size: 13, color: _C.textSecondary)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Credit option
+                  _Press(
+                    onTap: () => setState(() => _method = 'credit'),
+                    child: Row(
+                      children: [
+                        _RadioDot(selected: _method == 'credit'),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Crédito', style: _nu(size: 15, weight: FontWeight.w500)),
+                              Text('${CurrencyFormat.format(user.nubankCreditAvailable)} de limite disponível', style: _nu(size: 13, color: _C.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(border: Border.all(color: _C.textTertiary, width: 0.5), borderRadius: BorderRadius.circular(12)),
+                          child: Text('Até 24x', style: _nu(size: 11, color: _C.textSecondary)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_method == 'credit') ...[
+                    const SizedBox(height: 16),
+                    _buildInstGrid(installmentOptions),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          // CTA
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+            decoration: const BoxDecoration(
+              color: _C.surface,
+              border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const _Success())),
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                  child: Text(_method == 'credit' ? 'Pagar no crédito em ${_installments}x' : 'Pagar com saldo'),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstGrid(Map<int, double> options) {
+    final entries = options.entries.toList();
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 1.6),
+      itemCount: entries.length + 1,
+      itemBuilder: (context, i) {
+        if (i >= entries.length) {
+          return GestureDetector(
+            onTap: () {},
+            child: Container(
+              decoration: BoxDecoration(color: _C.cardLight, borderRadius: BorderRadius.circular(12)),
+              child: const Center(child: Icon(Icons.edit, color: _C.textSecondary, size: 22)),
+            ),
+          );
+        }
+        final e = entries[i];
+        final selected = _installments == e.key;
+        return GestureDetector(
+          onTap: () => setState(() => _installments = e.key),
+          child: Container(
+            decoration: BoxDecoration(
+              color: selected ? _C.purple : _C.cardLight,
+              borderRadius: BorderRadius.circular(12),
+              border: selected ? Border.all(color: const Color(0xFFCCCC00), width: 1.5) : null,
+            ),
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${e.key}x', style: _nu(size: 18, weight: FontWeight.w700, color: selected ? const Color(0xFFCCCC00) : _C.textPrimary)),
+                Text(CurrencyFormat.format(e.value), style: _nu(size: 11, color: selected ? Colors.white70 : _C.textSecondary)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _RadioDot extends StatelessWidget {
+  final bool selected;
+  const _RadioDot({required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: selected ? _C.purple : _C.textTertiary, width: 2),
+        color: selected ? _C.purple : Colors.transparent,
+      ),
+      child: selected ? const Icon(Icons.circle, size: 12, color: Colors.white) : null,
     );
   }
 }
@@ -1522,8 +1436,7 @@ class _Success extends ConsumerStatefulWidget {
   ConsumerState<_Success> createState() => _SuccessState();
 }
 
-class _SuccessState extends ConsumerState<_Success>
-    with TickerProviderStateMixin {
+class _SuccessState extends ConsumerState<_Success> with TickerProviderStateMixin {
   late final AnimationController _checkCtrl;
   late final AnimationController _scaleCtrl;
   late final AnimationController _confettiCtrl;
@@ -1531,13 +1444,9 @@ class _SuccessState extends ConsumerState<_Success>
   @override
   void initState() {
     super.initState();
-    _checkCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800));
-    _scaleCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
-    _confettiCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 2000));
-
+    _checkCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    _scaleCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _confettiCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
     _scaleCtrl.forward().then((_) {
       _checkCtrl.forward();
       _confettiCtrl.forward();
@@ -1555,51 +1464,35 @@ class _SuccessState extends ConsumerState<_Success>
   @override
   Widget build(BuildContext context) {
     final total = ref.watch(cartTotalProvider);
-
     return Scaffold(
-      backgroundColor: _C.surface,
+      backgroundColor: _C.bg,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             children: [
               const Spacer(flex: 2),
-              // Animated check + confetti
               Stack(
                 alignment: Alignment.center,
                 children: [
                   AnimatedBuilder(
                     animation: _confettiCtrl,
-                    builder: (context, _) => CustomPaint(
-                      size: const Size(200, 200),
-                      painter: _ConfettiPainter(
-                          progress: _confettiCtrl.value),
-                    ),
+                    builder: (context, _) => CustomPaint(size: const Size(200, 200), painter: _ConfettiPainter(progress: _confettiCtrl.value)),
                   ),
                   ScaleTransition(
-                    scale: CurvedAnimation(
-                        parent: _scaleCtrl, curve: Curves.easeOutBack),
+                    scale: CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeOutBack),
                     child: Container(
                       width: 110,
                       height: 110,
-                      decoration: BoxDecoration(
-                        color: _C.green.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: _C.purple.withValues(alpha: 0.15), shape: BoxShape.circle),
                       child: Center(
                         child: Container(
                           width: 72,
                           height: 72,
-                          decoration: const BoxDecoration(
-                            color: _C.green,
-                            shape: BoxShape.circle,
-                          ),
+                          decoration: const BoxDecoration(color: _C.purple, shape: BoxShape.circle),
                           child: ScaleTransition(
-                            scale: CurvedAnimation(
-                                parent: _checkCtrl,
-                                curve: Curves.elasticOut),
-                            child: const Icon(Icons.check,
-                                color: Colors.white, size: 36),
+                            scale: CurvedAnimation(parent: _checkCtrl, curve: Curves.elasticOut),
+                            child: const Icon(Icons.check, color: Colors.white, size: 36),
                           ),
                         ),
                       ),
@@ -1609,30 +1502,25 @@ class _SuccessState extends ConsumerState<_Success>
               ),
               const SizedBox(height: 28),
               FadeTransition(
-                opacity: CurvedAnimation(
-                    parent: _checkCtrl, curve: Curves.easeIn),
+                opacity: CurvedAnimation(parent: _checkCtrl, curve: Curves.easeIn),
                 child: Column(
                   children: [
-                    Text('Compra realizada!',
-                        style: GoogleFonts.inter(
-                            fontSize: 22, fontWeight: FontWeight.w600)),
+                    Text('Pagamento confirmado!', style: _nu(size: 22, weight: FontWeight.w600)),
                     const SizedBox(height: 6),
-                    Text('Seu pedido foi confirmado com sucesso.',
-                        style: GoogleFonts.inter(
-                            fontSize: 14, color: _C.textSec),
-                        textAlign: TextAlign.center),
+                    Text('Seu pedido foi processado com sucesso.', style: _nu(size: 14, color: _C.textSecondary), textAlign: TextAlign.center),
                     const SizedBox(height: 24),
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: _C.bg,
+                        color: _C.card,
                         borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: _C.cardBorder, width: 0.5),
                       ),
                       child: Column(
                         children: [
-                          _InfoRow('Total', CurrencyFormat.format(total)),
+                          _IRow('Total', CurrencyFormat.format(total)),
                           const SizedBox(height: 8),
-                          const _InfoRow('Previsão', '20-22 de fev'),
+                          const _IRow('Previsão', '20-22 de fev'),
                         ],
                       ),
                     ),
@@ -1648,8 +1536,7 @@ class _SuccessState extends ConsumerState<_Success>
                     ref.read(paymentProvider.notifier).reset();
                     Navigator.of(context).popUntil((r) => r.isFirst);
                   },
-                  style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16)),
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                   child: const Text('Voltar ao início'),
                 ),
               ),
@@ -1662,20 +1549,18 @@ class _SuccessState extends ConsumerState<_Success>
   }
 }
 
-class _InfoRow extends StatelessWidget {
+class _IRow extends StatelessWidget {
   final String label;
   final String value;
-  const _InfoRow(this.label, this.value);
+  const _IRow(this.label, this.value);
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style: GoogleFonts.inter(fontSize: 13, color: _C.textSec)),
-        Text(value,
-            style:
-                GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
+        Text(label, style: _nu(size: 13, color: _C.textSecondary)),
+        Text(value, style: _nu(size: 13, weight: FontWeight.w600)),
       ],
     );
   }
@@ -1689,28 +1574,23 @@ class _ConfettiPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (progress == 0) return;
-    final colors = [_C.primary, _C.orange, _C.green, _C.star, _C.pix];
+    final colors = [_C.purple, _C.purpleLight, _C.green, _C.star, _C.pix];
     for (int i = 0; i < 20; i++) {
       final a = _rng.nextDouble() * 2 * pi;
       final d = 40 + _rng.nextDouble() * 80;
       final x = size.width / 2 + cos(a) * d * progress;
-      final y =
-          size.height / 2 + sin(a) * d * progress + 20 * progress * progress;
+      final y = size.height / 2 + sin(a) * d * progress + 20 * progress * progress;
       final paint = Paint()
-        ..color = colors[i % colors.length].withOpacity(1 - progress)
+        ..color = colors[i % colors.length].withValues(alpha: 1 - progress)
         ..style = PaintingStyle.fill;
       final s = 3 + _rng.nextDouble() * 4;
       canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromCenter(center: Offset(x, y), width: s, height: s * 1.5),
-          const Radius.circular(1),
-        ),
+        RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(x, y), width: s, height: s * 1.5), const Radius.circular(1)),
         paint,
       );
     }
   }
 
   @override
-  bool shouldRepaint(covariant _ConfettiPainter old) =>
-      old.progress != progress;
+  bool shouldRepaint(covariant _ConfettiPainter old) => old.progress != progress;
 }

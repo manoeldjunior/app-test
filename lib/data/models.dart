@@ -14,10 +14,13 @@ class Product {
   final List<String> galleryUrls;
   final String description;
   final bool freeShipping;
+  final double? shippingCost;
   final String? deliveryDate;
   final int maxInstallments;
   final double installmentPrice;
   final bool isNew;
+  final String? seller;
+  final double? historicalAvgPrice;
 
   const Product({
     required this.id,
@@ -33,10 +36,13 @@ class Product {
     this.galleryUrls = const [],
     this.description = '',
     this.freeShipping = false,
+    this.shippingCost,
     this.deliveryDate,
     this.maxInstallments = 1,
     this.installmentPrice = 0,
     this.isNew = false,
+    this.seller,
+    this.historicalAvgPrice,
   });
 
   Product copyWith({
@@ -53,10 +59,13 @@ class Product {
     List<String>? galleryUrls,
     String? description,
     bool? freeShipping,
+    double? shippingCost,
     String? deliveryDate,
     int? maxInstallments,
     double? installmentPrice,
     bool? isNew,
+    String? seller,
+    double? historicalAvgPrice,
   }) {
     return Product(
       id: id ?? this.id,
@@ -72,10 +81,13 @@ class Product {
       galleryUrls: galleryUrls ?? this.galleryUrls,
       description: description ?? this.description,
       freeShipping: freeShipping ?? this.freeShipping,
+      shippingCost: shippingCost ?? this.shippingCost,
       deliveryDate: deliveryDate ?? this.deliveryDate,
       maxInstallments: maxInstallments ?? this.maxInstallments,
       installmentPrice: installmentPrice ?? this.installmentPrice,
       isNew: isNew ?? this.isNew,
+      seller: seller ?? this.seller,
+      historicalAvgPrice: historicalAvgPrice ?? this.historicalAvgPrice,
     );
   }
 }
@@ -104,6 +116,16 @@ class UserProfile {
   final double carneDigitalLimit;
   final double carneDigitalUsed;
   final int creditScore;
+  // Mercado Pago fields
+  final double mercadoPagoBalance;
+  final double creditLineAvailable;
+  final int creditLineMaxInstallments;
+  final double meliDolarBalance;
+  // Nubank fields
+  final double nubankBalance;
+  final double nubankCreditLimit;
+  final double nubankCreditUsed;
+  final String nubankTier;
 
   const UserProfile({
     required this.name,
@@ -113,9 +135,18 @@ class UserProfile {
     this.carneDigitalLimit = 0,
     this.carneDigitalUsed = 0,
     this.creditScore = 0,
+    this.mercadoPagoBalance = 0,
+    this.creditLineAvailable = 0,
+    this.creditLineMaxInstallments = 36,
+    this.meliDolarBalance = 0,
+    this.nubankBalance = 0,
+    this.nubankCreditLimit = 0,
+    this.nubankCreditUsed = 0,
+    this.nubankTier = 'Ultravioleta',
   });
 
   double get carneDigitalAvailable => carneDigitalLimit - carneDigitalUsed;
+  double get nubankCreditAvailable => nubankCreditLimit - nubankCreditUsed;
 }
 
 enum PaymentMethod {
@@ -124,6 +155,11 @@ enum PaymentMethod {
   pix,
   carneDigital,
   boleto,
+  mercadoPagoBalance,
+  creditLine,
+  meliDolar,
+  nubankBalance,
+  nubankCredit,
 }
 
 class PaymentOption {
@@ -139,6 +175,34 @@ class PaymentOption {
     this.subtitle,
     required this.iconName,
     this.isAvailable = true,
+  });
+}
+
+class BankCard {
+  final String brand;
+  final String lastFour;
+  final String network; // visa, mastercard, etc.
+  final Color brandColor;
+
+  const BankCard({
+    required this.brand,
+    required this.lastFour,
+    required this.network,
+    required this.brandColor,
+  });
+}
+
+class InstallmentOption {
+  final int count;
+  final double perInstallment;
+  final double total;
+  final bool hasInterest;
+
+  const InstallmentOption({
+    required this.count,
+    required this.perInstallment,
+    required this.total,
+    this.hasInterest = false,
   });
 }
 
