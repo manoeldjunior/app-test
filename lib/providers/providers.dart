@@ -127,6 +127,11 @@ final userProvider = StateNotifierProvider<UserNotifier, UserState>((ref) {
 // ─── Navigation Provider ─────────────────────────────────
 final selectedNavIndexProvider = StateProvider<int>((ref) => 0);
 
+// ─── CDC User State Provider ─────────────────────────────
+final cdcUserStateProvider = StateProvider<CdcUserState>((ref) {
+  return CdcUserState.preAprovado;
+});
+
 // ─── Shipping Provider ──────────────────────────────────
 final shippingMethodProvider = StateProvider<String>((ref) => 'delivery');
 final cepProvider = StateProvider<String>((ref) => '');

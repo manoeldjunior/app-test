@@ -1,17 +1,22 @@
 // ═══════════════════════════════════════════════════════════
 // Comparison Screen — Side-by-Side Variant View
 // ═══════════════════════════════════════════════════════════
-// Shows all 3 app variants in phone-frame mockups on a dark
-// background. Responsive: 3-up on wide screens, horizontal
-// scroll or tabs on narrow screens.
+// Shows app variants in phone-frame mockups on a dark bg.
+// Original group: V1-V3. Competitors removed per directive.
 // ═══════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'phone_frame.dart';
 import '../v1/v1_app.dart';
 import '../v2/v2_app.dart';
 import '../v3/v3_app.dart';
+import '../v1/v1_widgets.dart';
+import '../hybrids/hybrid_a.dart';
+import '../hybrids/hybrid_b.dart';
+import '../hybrids/hybrid_c.dart';
+import '../hybrids/v_agent_final.dart';
 
 class ComparisonScreen extends StatelessWidget {
   const ComparisonScreen({super.key});
@@ -54,7 +59,7 @@ class _ComparisonPage extends StatelessWidget {
             children: [
               // ─── Header ──────────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
                 child: Column(
                   children: [
                     Row(
@@ -86,7 +91,7 @@ class _ComparisonPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Toque nas telas para navegar. Compare as 3 versões lado a lado.',
+                      'Toque nas telas para navegar. V1 (Magalu) • V2 (ML) • V3 (Nubank) • Hybrids A-C • Final',
                       style: GoogleFonts.inter(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 11,
@@ -99,9 +104,7 @@ class _ComparisonPage extends StatelessWidget {
 
               // ─── Phone Frames ────────────────────────────
               Expanded(
-                child: isWide
-                    ? _buildWideLayout()
-                    : _buildNarrowLayout(),
+                child: isWide ? _buildWide() : _buildNarrow(),
               ),
             ],
           ),
@@ -110,47 +113,90 @@ class _ComparisonPage extends StatelessWidget {
     );
   }
 
-  /// Wide layout: 3 phones side by side
-  Widget _buildWideLayout() {
-    return Row(
-      children: [
-        Expanded(
-          child: PhoneFrame(
-            label: 'Magalu Atual',
-            subtitle: 'Experiência utilitarian',
-            child: const V1App(),
+  Widget _buildWide() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 320,
+            child: ProviderScope(
+              child: PhoneFrame(
+                label: 'Magalu Atual',
+                subtitle: 'Experiência utilitarian',
+                headerWidget: const CdcStateToggle(),
+                child: const V1App(),
+              ),
+            ),
           ),
-        ),
-        Expanded(
-          child: PhoneFrame(
-            label: 'Magalu × ML',
-            subtitle: 'Padrões Mercado Livre',
-            child: const V2App(),
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: 'Magalu × ML',
+              subtitle: 'Padrões Mercado Livre',
+              child: const V2App(),
+            ),
           ),
-        ),
-        Expanded(
-          child: PhoneFrame(
-            label: 'Magalu × Nubank',
-            subtitle: 'Elegância e fluidez premium',
-            child: const V3App(),
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: 'Magalu × Nubank',
+              subtitle: 'Elegância e fluidez premium',
+              child: const V3App(),
+            ),
           ),
-        ),
-      ],
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: 'Hybrid A',
+              subtitle: 'Alta densidade • Pix Parcelado',
+              child: const HybridAApp(),
+            ),
+          ),
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: 'Hybrid B',
+              subtitle: 'Espaçoso • Limite Magalu',
+              child: const HybridBApp(),
+            ),
+          ),
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: 'Hybrid C',
+              subtitle: 'Balanceado • Crédito Rápido',
+              child: const HybridCApp(),
+            ),
+          ),
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: '★ V_Agent_Final',
+              subtitle: 'Nubank Shell × ML Engine × Magalu',
+              child: const VAgentFinalApp(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  /// Narrow layout: horizontal scroll
-  Widget _buildNarrowLayout() {
+  Widget _buildNarrow() {
     return ListView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       children: [
         SizedBox(
           width: 300,
-          child: PhoneFrame(
-            label: 'Magalu Atual',
-            subtitle: 'Experiência utilitarian',
-            child: const V1App(),
+          child: ProviderScope(
+            child: PhoneFrame(
+              label: 'Magalu Atual',
+              subtitle: 'Experiência utilitarian',
+              headerWidget: const CdcStateToggle(),
+              child: const V1App(),
+            ),
           ),
         ),
         SizedBox(
@@ -169,7 +215,40 @@ class _ComparisonPage extends StatelessWidget {
             child: const V3App(),
           ),
         ),
+        SizedBox(
+          width: 300,
+          child: PhoneFrame(
+            label: 'Hybrid A',
+            subtitle: 'Alta densidade • Pix Parcelado',
+            child: const HybridAApp(),
+          ),
+        ),
+        SizedBox(
+          width: 300,
+          child: PhoneFrame(
+            label: 'Hybrid B',
+            subtitle: 'Espaçoso • Limite Magalu',
+            child: const HybridBApp(),
+          ),
+        ),
+        SizedBox(
+          width: 300,
+          child: PhoneFrame(
+            label: 'Hybrid C',
+            subtitle: 'Balanceado • Crédito Rápido',
+            child: const HybridCApp(),
+          ),
+        ),
+        SizedBox(
+          width: 300,
+          child: PhoneFrame(
+            label: '★ V_Agent_Final',
+            subtitle: 'Nubank Shell × ML Engine × Magalu',
+            child: const VAgentFinalApp(),
+          ),
+        ),
       ],
     );
   }
 }
+

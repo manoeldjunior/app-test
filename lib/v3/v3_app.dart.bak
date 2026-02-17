@@ -1,22 +1,9 @@
 // ═══════════════════════════════════════════════════════════
-// V3 — Nubank Shopping Experience (Pixel-Perfect Rewrite)
+// V3 — Nubank Experience (Black/Purple, NuPay)
 // ═══════════════════════════════════════════════════════════
-// Matched to real Nubank Shopping screenshots:
-//   1. Home: "Shopping" title, search, 4 circular actions
-//      (Pedidos/Cupons/Lojas/Gift Cards), horizontal
-//      product carousel with discount badges + installment text.
-//      NO balance card, NO credit indicator, NO bank actions.
-//   2. PDP: "Shopping do Nu" header, large image + dots,
-//      brand name, truncated name + "Ler mais", item code,
-//      model dropdown, price + discount, "Ou R$ X em 10x sem
-//      juros", purple link, delivery + seller, price history,
-//      "Comprar agora" + "Adicionar ao carrinho" CTAs.
-//      NO credit pre-approval card.
-//   3. Checkout: purple header "Tudo certo para finalizar
-//      seu pedido?", order summary, items, address + edit.
-//   4. NuPay: "À vista com saldo" + "Crédito" (Até 24x pill).
-//      Installment grid 1x/2x/3x/12x/24x + edit. Purple CTA.
-//      NO Pix option. NO Contract Gate.
+// Pixel-perfect replica of the Nubank checkout + NuPay
+// payment screens from the provided screenshots.
+// Dark theme, purple accents, minimalist typography.
 // ═══════════════════════════════════════════════════════════
 
 import 'dart:math';
@@ -29,21 +16,24 @@ import '../data/mock_data.dart';
 import '../providers/providers.dart';
 import '../utils/currency_format.dart';
 
-// ─── Nubank Colors ───────────────────────────────────────
+// ─── Nubank Colors (from screenshots) ────────────────────
 class _C {
   static const purple = Color(0xFF820AD1);
+  static const purpleDark = Color(0xFF6B07AE);
   static const purpleLight = Color(0xFF9B3FDB);
-  static const bg = Color(0xFFF5F5F5);       // Light shopping background
-  static const surface = Colors.white;
-  static const card = Colors.white;
-  static const cardBorder = Color(0xFFE8E8E8);
-  static const textPrimary = Color(0xFF1A1A1A);
-  static const textSecondary = Color(0xFF6B6B6B);
-  static const textTertiary = Color(0xFF999999);
+  static const bg = Color(0xFF111111);
+  static const surface = Color(0xFF1A1A1A);
+  static const card = Color(0xFF222222);
+  static const cardLight = Color(0xFF2A2A2A);
+  static const cardBorder = Color(0xFF333333);
+  static const textPrimary = Color(0xFFFFFFFF);
+  static const textSecondary = Color(0xFFAAAAAA);
+  static const textTertiary = Color(0xFF777777);
   static const green = Color(0xFF00A650);
-  static const greenLight = Color(0xFFE8F7EE);
+  static const greenLight = Color(0xFF1A3A2A);
   static const red = Color(0xFFFF4444);
-  static const discountGreen = Color(0xFF00A650);
+  static const star = Color(0xFFFFC107);
+  static const pix = Color(0xFF00BDAE);
 }
 
 TextStyle _nu({
@@ -71,20 +61,27 @@ class V3App extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
-          brightness: Brightness.light,
+          brightness: Brightness.dark,
           scaffoldBackgroundColor: _C.bg,
-          colorScheme: ColorScheme.light(
+          colorScheme: const ColorScheme.dark(
             primary: _C.purple,
             onPrimary: Colors.white,
             surface: _C.surface,
             onSurface: _C.textPrimary,
           ),
-          textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+          textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
           appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
+            backgroundColor: _C.bg,
             foregroundColor: _C.textPrimary,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
+          ),
+          cardTheme: CardThemeData(
+            color: _C.card,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
@@ -155,151 +152,276 @@ class _PressState extends State<_Press> with SingleTickerProviderStateMixin {
 }
 
 // ═════════════════════════════════════════════════════════
-// HOME — Nubank Shopping (NOT bank app)
-// Simple "Shopping" title, search, 4 circular actions,
-// horizontal product carousel. NO balance, NO credit.
+// HOME — Nubank dark style with credit indicators
 // ═════════════════════════════════════════════════════════
 class _Home extends ConsumerWidget {
   const _Home();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).user;
     final cartCount = ref.watch(cartItemCountProvider);
-    final products = MockData.products;
+    final userState = ref.watch(userProvider);
 
     return Scaffold(
       backgroundColor: _C.bg,
-      body: Column(
-        children: [
-          // ── White header ──
-          Container(
-            color: _C.surface,
-            child: SafeArea(
-              bottom: false,
-              child: Column(
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 110,
+            floating: true,
+            pinned: true,
+            backgroundColor: _C.purple,
+            surfaceTintColor: _C.purple,
+            leading: IconButton(
+              onPressed: () {},
+              icon: const CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.white24,
+                child: Icon(Icons.person, color: Colors.white, size: 20),
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.visibility_outlined, color: Colors.white),
+              ),
+              Stack(
                 children: [
-                  // Top bar: "Shopping" + icons
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 12, 0),
+                  IconButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const _Cart()),
+                    ),
+                    icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                  ),
+                  if (cartCount > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(color: _C.red, shape: BoxShape.circle),
+                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                        child: Text('$cartCount', style: _nu(size: 10), textAlign: TextAlign.center),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 4),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                color: _C.purple,
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: Colors.white70, size: 20),
+                      const SizedBox(width: 10),
+                      Text('Buscar no Shopping', style: _nu(size: 14, color: Colors.white70)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Balance / Credit Card
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: _C.card,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: _C.cardBorder, width: 0.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Conta', style: _nu(size: 14, weight: FontWeight.w600, color: _C.textSecondary)),
+                      GestureDetector(
+                        onTap: () => ref.read(userProvider.notifier).toggleBalanceVisibility(),
+                        child: Icon(
+                          userState.balanceVisible ? Icons.visibility : Icons.visibility_off,
+                          color: _C.textSecondary,
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    userState.balanceVisible ? CurrencyFormat.format(user.nubankBalance) : r'R$ ••••••',
+                    style: _nu(size: 28, weight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 16),
+                  // Credit indicator (top of funnel)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _C.purple.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: _C.purple.withValues(alpha: 0.3), width: 0.5),
+                    ),
                     child: Row(
                       children: [
-                        Text('Shopping', style: _nu(size: 22, weight: FontWeight.w700, color: _C.textPrimary)),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.favorite_border, color: _C.textSecondary, size: 22),
-                        ),
-                        Stack(
-                          children: [
-                            IconButton(
-                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const _Cart())),
-                              icon: const Icon(Icons.shopping_bag_outlined, color: _C.textSecondary, size: 22),
-                            ),
-                            if (cartCount > 0)
-                              Positioned(
-                                right: 6, top: 6,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(color: _C.purple, shape: BoxShape.circle),
-                                  child: Text('$cartCount', style: _nu(size: 8, color: Colors.white, weight: FontWeight.w700), textAlign: TextAlign.center),
-                                ),
+                        const Icon(Icons.credit_card, color: _C.purpleLight, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Limite disponível', style: _nu(size: 11, color: _C.textSecondary)),
+                              Text(
+                                CurrencyFormat.format(user.nubankCreditAvailable),
+                                style: _nu(size: 15, weight: FontWeight.w600, color: _C.purpleLight),
                               ),
-                          ],
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(color: _C.purple, borderRadius: BorderRadius.circular(12)),
+                          child: Text('Até 24x', style: _nu(size: 10, weight: FontWeight.w600)),
                         ),
                       ],
                     ),
                   ),
-                  // Search bar
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _QuickAct(Icons.pix, 'Pix', _C.pix),
+                      _QuickAct(Icons.receipt_long, 'Pagar', _C.purple),
+                      _QuickAct(Icons.swap_horiz, 'Transferir', _C.purpleLight),
+                      _QuickAct(Icons.credit_card, 'Cartão', _C.purple),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Shopping do Nu Banner
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  colors: [_C.purple, _C.purpleDark],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -20,
+                    top: -20,
                     child: Container(
-                      height: 42,
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
-                        color: _C.bg,
-                        borderRadius: BorderRadius.circular(21),
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.08),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: _C.textTertiary, size: 20),
-                          const SizedBox(width: 8),
-                          Text('Busque no Shopping do Nu', style: _nu(size: 14, color: _C.textTertiary)),
-                        ],
-                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Shopping do Nu', style: _nu(size: 18, weight: FontWeight.w700)),
+                        const SizedBox(height: 4),
+                        Text('Parcele em até 24x no crédito', style: _nu(size: 13, color: Colors.white70)),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          // ── Scrollable content ──
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                // 4 circular action buttons
-                Container(
-                  color: _C.surface,
-                  padding: const EdgeInsets.fromLTRB(0, 4, 0, 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      _CircAction(Icons.receipt_long_outlined, 'Pedidos'),
-                      _CircAction(Icons.confirmation_number_outlined, 'Cupons'),
-                      _CircAction(Icons.store_outlined, 'Lojas'),
-                      _CircAction(Icons.card_giftcard, 'Gift Cards'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // ── Product sections (horizontal scroll) ──
-                _ProductSection(
-                  title: 'Para você',
-                  products: products.take(4).toList(),
-                ),
-                const SizedBox(height: 8),
-                _ProductSection(
-                  title: 'Mais vendidos',
-                  products: products.skip(1).take(4).toList(),
-                ),
-                const SizedBox(height: 8),
-                _ProductSection(
-                  title: 'Ofertas',
-                  products: products.reversed.take(4).toList(),
-                ),
-                const SizedBox(height: 16),
-              ],
+
+          // Products
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text('Para você', style: _nu(size: 18, weight: FontWeight.w600)),
             ),
           ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) {
+                final p = MockData.products[i];
+                return _ProductCard(
+                  product: p,
+                  onAddToCart: () {
+                    ref.read(cartProvider.notifier).addItem(p);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${p.brand} adicionado', style: const TextStyle(color: Colors.white)),
+                        backgroundColor: _C.purple,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        margin: const EdgeInsets.all(16),
+                      ),
+                    );
+                  },
+                );
+              },
+              childCount: MockData.products.length,
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
-      // Bottom nav: Início / Cartão / Shopping / Pix / Perfil (per Nubank)
       bottomNavigationBar: _BottomNav(cartCount: cartCount),
     );
   }
 }
 
-class _CircAction extends StatelessWidget {
+class _QuickAct extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _CircAction(this.icon, this.label);
+  final Color color;
+  const _QuickAct(this.icon, this.label, this.color);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 56, height: 56,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _C.bg,
+    return _Press(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 20),
           ),
-          child: Icon(icon, color: _C.purple, size: 24),
-        ),
-        const SizedBox(height: 6),
-        Text(label, style: _nu(size: 11, color: _C.textSecondary)),
-      ],
+          const SizedBox(height: 4),
+          Text(label, style: _nu(size: 10, color: _C.textSecondary)),
+        ],
+      ),
     );
   }
 }
@@ -321,19 +443,20 @@ class _BottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NI(Icons.home, 'Início', false),
+              _NI(Icons.home, 'Início', true),
               _NI(Icons.credit_card, 'Cartão', false),
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  _NI(Icons.shopping_bag_outlined, 'Shopping', true),
+                  _NI(Icons.shopping_bag_outlined, 'Shopping', false),
                   if (cartCount > 0)
                     Positioned(
-                      right: 2, top: -2,
+                      right: 2,
+                      top: -2,
                       child: Container(
                         padding: const EdgeInsets.all(3),
                         decoration: const BoxDecoration(color: _C.purple, shape: BoxShape.circle),
-                        child: Text('$cartCount', style: _nu(size: 8, color: Colors.white, weight: FontWeight.w700)),
+                        child: Text('$cartCount', style: _nu(size: 8)),
                       ),
                     ),
                 ],
@@ -361,108 +484,133 @@ class _NI extends StatelessWidget {
       children: [
         Icon(icon, color: active ? _C.purple : _C.textTertiary, size: 24),
         const SizedBox(height: 2),
-        Text(label, style: _nu(size: 10, weight: active ? FontWeight.w600 : FontWeight.w400, color: active ? _C.purple : _C.textTertiary)),
+        Text(
+          label,
+          style: _nu(
+            size: 10,
+            weight: active ? FontWeight.w600 : FontWeight.w400,
+            color: active ? _C.purple : _C.textTertiary,
+          ),
+        ),
       ],
     );
   }
 }
 
-// ─── Product Section (horizontal scroll) ─────────────────
-class _ProductSection extends StatelessWidget {
-  final String title;
-  final List<Product> products;
-  const _ProductSection({required this.title, required this.products});
+// ─── Product Card ────────────────────────────────────────
+class _ProductCard extends StatelessWidget {
+  final Product product;
+  final VoidCallback? onAddToCart;
+  const _ProductCard({required this.product, this.onAddToCart});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: _C.surface,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            child: Text(title, style: _nu(size: 16, weight: FontWeight.w700)),
-          ),
-          SizedBox(
-            height: 230,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: products.length,
-              itemBuilder: (_, i) => _HomeCard(product: products[i]),
-            ),
-          ),
-        ],
+    final user = MockData.user;
+    return _Press(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => _ProductDetail(product: product)),
       ),
-    );
-  }
-}
-
-class _HomeCard extends ConsumerWidget {
-  final Product product;
-  const _HomeCard({required this.product});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => _ProductDetail(product: product))),
       child: Container(
-        width: 155,
-        margin: const EdgeInsets.only(right: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
           color: _C.card,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: _C.cardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image with discount badge
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CachedNetworkImage(
                     imageUrl: product.imageUrl,
-                    height: 120,
+                    height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(color: _C.bg, height: 120),
-                    errorWidget: (_, __, ___) => Container(color: _C.bg, height: 120),
+                    placeholder: (_, __) => Container(color: _C.cardLight, height: 180),
                   ),
                 ),
                 if (product.discountPercent > 0)
                   Positioned(
-                    top: 8, left: 8,
+                    top: 12,
+                    left: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: _C.discountGreen,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text('↓ ${product.discountPercent}%',
-                          style: _nu(size: 10, weight: FontWeight.w700, color: Colors.white)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: _C.purple, borderRadius: BorderRadius.circular(20)),
+                      child: Text('${product.discountPercent}% OFF', style: _nu(size: 11, weight: FontWeight.w700)),
                     ),
                   ),
               ],
             ),
-            // Info
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name, style: _nu(size: 12, color: _C.textPrimary),
-                      maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text(CurrencyFormat.format(product.price),
-                      style: _nu(size: 16, weight: FontWeight.w700, color: _C.textPrimary)),
-                  if (product.maxInstallments > 1)
-                    Text('Em até ${product.maxInstallments}x',
-                        style: _nu(size: 11, color: _C.textTertiary)),
+                  Text(product.name, style: _nu(size: 14, weight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  if (product.originalPrice != null)
+                    Text(
+                      CurrencyFormat.format(product.originalPrice!),
+                      style: _nu(size: 12, color: _C.textTertiary).copyWith(decoration: TextDecoration.lineThrough),
+                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(CurrencyFormat.format(product.price), style: _nu(size: 20, weight: FontWeight.w700)),
+                      if (product.maxInstallments > 1) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          'em até ${product.maxInstallments}x de ${CurrencyFormat.format(product.installmentPrice)}',
+                          style: _nu(size: 11, color: _C.textSecondary),
+                        ),
+                      ],
+                    ],
+                  ),
+                  // Credit indicator on product card (top of funnel)
+                  if (user.nubankCreditAvailable >= product.price)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _C.purple.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.credit_card, color: _C.purpleLight, size: 12),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Parcele em até 24x no crédito',
+                              style: _nu(size: 10, color: _C.purpleLight, weight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: onAddToCart,
+                  icon: const Icon(Icons.add_shopping_cart, size: 18),
+                  label: const Text('Adicionar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _C.purple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
+                ),
               ),
             ),
           ],
@@ -473,11 +621,7 @@ class _HomeCard extends ConsumerWidget {
 }
 
 // ═════════════════════════════════════════════════════════
-// PRODUCT DETAIL — "Shopping do Nu" PDP
-// Large image + dots, brand, truncated name + "Ler mais",
-// item code, model dropdown, price + discount, installments
-// link, delivery + seller, price history, two CTAs.
-// NO credit pre-approval card.
+// PRODUCT DETAIL
 // ═════════════════════════════════════════════════════════
 class _ProductDetail extends ConsumerWidget {
   final Product product;
@@ -485,308 +629,226 @@ class _ProductDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final itemCode = (10000 + product.id.hashCode % 90000).abs();
-
+    final user = MockData.user;
     return Scaffold(
       backgroundColor: _C.bg,
-      body: Column(
-        children: [
-          // ── Purple header bar ──
-          Container(
-            color: _C.purple,
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(4, 0, 12, 10),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    Expanded(
-                      child: Text('Shopping do Nu', style: _nu(size: 16, weight: FontWeight.w600, color: Colors.white)),
-                    ),
-                    const Icon(Icons.share_outlined, color: Colors.white, size: 20),
-                    const SizedBox(width: 14),
-                    const Icon(Icons.favorite_border, color: Colors.white, size: 20),
-                  ],
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            backgroundColor: _C.surface,
+            foregroundColor: _C.textPrimary,
+            leading: Padding(
+              padding: const EdgeInsets.all(8),
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _C.card.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_back, color: _C.textPrimary),
                 ),
               ),
             ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: product.imageUrl,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(color: _C.cardLight),
+                  ),
+                  if (product.discountPercent > 0)
+                    Positioned(
+                      top: 100,
+                      left: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: _C.purple, borderRadius: BorderRadius.circular(20)),
+                        child: Text('${product.discountPercent}% OFF', style: _nu(size: 12, weight: FontWeight.w700)),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
-          // ── Scrollable content ──
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                // Product image with dot indicators
-                Container(
-                  color: _C.surface,
-                  child: Column(
+          SliverToBoxAdapter(
+            child: Container(
+              color: _C.surface,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(product.brand.toUpperCase(), style: _nu(size: 12, weight: FontWeight.w500, color: _C.purple).copyWith(letterSpacing: 1.2)),
+                  const SizedBox(height: 6),
+                  Text(product.name, style: _nu(size: 20, weight: FontWeight.w600)),
+                  const SizedBox(height: 10),
+                  Row(
                     children: [
-                      CachedNetworkImage(
-                        imageUrl: product.imageUrl,
-                        height: 280,
-                        width: double.infinity,
-                        fit: BoxFit.contain,
-                        placeholder: (_, __) => Container(color: _C.bg, height: 280),
-                      ),
-                      // Dot indicators
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(4, (i) => Container(
-                          width: 8, height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: i == 0 ? _C.purple : const Color(0xFFDDDDDD),
-                          ),
-                        )),
-                      ),
+                      ...List.generate(5, (i) => Icon(i < product.rating.floor() ? Icons.star : Icons.star_border, color: _C.star, size: 18)),
+                      const SizedBox(width: 8),
+                      Text('${product.rating} (${product.reviewCount})', style: _nu(size: 12, color: _C.textSecondary)),
                     ],
                   ),
-                ),
-                // ── Product info ──
-                Container(
-                  color: _C.surface,
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              color: _C.surface,
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Divider(height: 24, color: _C.cardBorder),
+                  if (product.originalPrice != null)
+                    Text(
+                      'De ${CurrencyFormat.format(product.originalPrice!)}',
+                      style: _nu(size: 14, color: _C.textTertiary).copyWith(decoration: TextDecoration.lineThrough),
+                    ),
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
-                      // Brand name
-                      Text(product.brand, style: _nu(size: 12, color: _C.textTertiary)),
-                      const SizedBox(height: 4),
-                      // Truncated product name + "Ler mais"
-                      RichText(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          style: _nu(size: 14, color: _C.textPrimary),
-                          children: [
-                            TextSpan(text: product.name),
-                            TextSpan(text: '... ', style: _nu(size: 14, color: _C.textPrimary)),
-                            TextSpan(text: 'Ler mais', style: _nu(size: 14, color: _C.purple, weight: FontWeight.w500)),
-                          ],
+                      Text(CurrencyFormat.format(product.price), style: _nu(size: 28, weight: FontWeight.w700)),
+                      if (product.discountPercent > 0) ...[
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(color: _C.greenLight, borderRadius: BorderRadius.circular(6)),
+                          child: Text('-${product.discountPercent}%', style: _nu(size: 11, weight: FontWeight.w700, color: _C.green)),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Item code
-                      Text('Cód. Item $itemCode', style: _nu(size: 11, color: _C.textTertiary)),
-                      const SizedBox(height: 10),
-                      // Model selector dropdown
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: _C.cardBorder),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Text('Modelo: ', style: _nu(size: 13, color: _C.textSecondary)),
-                            Expanded(
-                              child: Text(product.brand, style: _nu(size: 13, weight: FontWeight.w500)),
-                            ),
-                            const Icon(Icons.keyboard_arrow_down, size: 18, color: _C.textTertiary),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      // Price + discount badge
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(CurrencyFormat.format(product.price),
-                              style: _nu(size: 26, weight: FontWeight.w700)),
-                          if (product.discountPercent > 0) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: _C.greenLight,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text('-${product.discountPercent}%',
-                                  style: _nu(size: 11, weight: FontWeight.w700, color: _C.discountGreen)),
-                            ),
-                          ],
-                        ],
-                      ),
-                      if (product.originalPrice != null) ...[
-                        const SizedBox(height: 2),
-                        Text(CurrencyFormat.format(product.originalPrice!),
-                            style: _nu(size: 13, color: _C.textTertiary).copyWith(decoration: TextDecoration.lineThrough)),
                       ],
-                      const SizedBox(height: 6),
-                      // "Ou R$ X em 10x sem juros"
-                      if (product.maxInstallments > 1)
-                        Text('Ou ${CurrencyFormat.format(product.price)} em ${product.maxInstallments}x sem juros',
-                            style: _nu(size: 13, color: _C.textSecondary)),
-                      const SizedBox(height: 4),
-                      // Purple link: installments info
-                      if (product.maxInstallments > 1)
-                        GestureDetector(
-                          onTap: () {},
-                          child: Row(
+                    ],
+                  ),
+                  if (product.maxInstallments > 1) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      'em até ${product.maxInstallments}x de ${CurrencyFormat.format(product.installmentPrice)} sem juros',
+                      style: _nu(size: 14, color: _C.textSecondary),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _C.purple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _C.purple.withValues(alpha: 0.25), width: 0.5),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.credit_card, color: _C.purple, size: 22),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Flexible(
-                                child: Text('Até ${product.maxInstallments}x sem juros ou 24x com juros',
-                                    style: _nu(size: 13, color: _C.purple, weight: FontWeight.w500)),
+                              Text('Crédito pré-aprovado disponível', style: _nu(size: 12, weight: FontWeight.w600, color: _C.purpleLight)),
+                              Text(
+                                '${CurrencyFormat.format(user.nubankCreditAvailable)} de limite \u2022 Até 24x',
+                                style: _nu(size: 11, color: _C.textSecondary),
                               ),
-                              const SizedBox(width: 4),
-                              Icon(Icons.arrow_forward_ios, size: 10, color: _C.purple),
                             ],
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // ── Delivery section ──
-                Container(
-                  color: _C.surface,
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.local_shipping_outlined, color: _C.textSecondary, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.freeShipping ? 'Frete grátis' : 'Frete a calcular',
-                                  style: _nu(size: 14, weight: FontWeight.w600, color: product.freeShipping ? _C.green : _C.textPrimary),
-                                ),
-                                if (product.deliveryDate != null)
-                                  Text('Chegará ${product.deliveryDate}', style: _nu(size: 12, color: _C.textSecondary)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      // Address
-                      Row(
-                        children: [
-                          Icon(Icons.location_on_outlined, color: _C.textTertiary, size: 16),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text('Rua Topázio, 701 — São Paulo, SP', style: _nu(size: 12, color: _C.textSecondary)),
-                          ),
-                          GestureDetector(
-                            onTap: () {},
-                            child: Text('Alterar', style: _nu(size: 12, color: _C.purple, weight: FontWeight.w500)),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 20, color: _C.cardBorder),
-                      // Seller info
-                      Text('Vendido e entregue por', style: _nu(size: 12, color: _C.textTertiary)),
-                      const SizedBox(height: 2),
-                      Text(product.seller ?? 'Casas Bahia', style: _nu(size: 13, weight: FontWeight.w500, color: _C.textPrimary)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // ── Price history card ──
-                Container(
-                  color: _C.surface,
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: _C.greenLight,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.trending_down, color: _C.green, size: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Menor preço histórico', style: _nu(size: 13, weight: FontWeight.w600, color: _C.green)),
-                            Text('Comparado com os últimos 90 dias', style: _nu(size: 11, color: _C.textTertiary)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 80), // space for bottom bar
-              ],
-            ),
-          ),
-          // ── Bottom CTAs ──
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            decoration: BoxDecoration(
-              color: _C.surface,
-              border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Column(
-                children: [
-                  // "Comprar agora" (purple)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        ref.read(cartProvider.notifier).addItem(product);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const _Cart()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      ),
-                      child: const Text('Comprar agora'),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // "Adicionar ao carrinho" (grey)
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        ref.read(cartProvider.notifier).addItem(product);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('Adicionado ao carrinho'),
-                            backgroundColor: _C.purple,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            margin: const EdgeInsets.all(16),
-                          ),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _C.textSecondary,
-                        side: const BorderSide(color: _C.cardBorder, width: 1.5),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      ),
-                      child: const Text('Adicionar ao carrinho'),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
           ),
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.only(top: 8),
+              color: _C.surface,
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: _C.greenLight, borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.local_shipping, color: _C.green, size: 24),
+                  ),
+                  const SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.freeShipping ? 'Frete Grátis' : 'Frete a calcular',
+                        style: _nu(size: 14, weight: FontWeight.w600, color: product.freeShipping ? _C.green : _C.textPrimary),
+                      ),
+                      if (product.deliveryDate != null) Text('Chegará ${product.deliveryDate}', style: _nu(size: 12, color: _C.textSecondary)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
+      ),
+      bottomSheet: Container(
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+        decoration: const BoxDecoration(
+          color: _C.surface,
+          border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ref.read(cartProvider.notifier).addItem(product);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${product.brand} adicionado'),
+                      backgroundColor: _C.purple,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.all(16),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.add_shopping_cart, size: 18),
+                label: const Text('Adicionar'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _C.purple,
+                  side: const BorderSide(color: _C.purple),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton(
+                onPressed: () {
+                  ref.read(cartProvider.notifier).addItem(product);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const _Cart()));
+                },
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                child: const Text('Comprar agora'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 // ═════════════════════════════════════════════════════════
-// CART — "Sacola"
+// CART
 // ═════════════════════════════════════════════════════════
 class _Cart extends ConsumerWidget {
   const _Cart();
@@ -810,7 +872,7 @@ class _Cart extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.shopping_bag_outlined, size: 64, color: _C.textTertiary),
+                  Icon(Icons.shopping_bag_outlined, size: 64, color: _C.textTertiary.withValues(alpha: 0.5)),
                   const SizedBox(height: 16),
                   Text('Sua sacola está vazia', style: _nu(size: 18, weight: FontWeight.w600, color: _C.textSecondary)),
                 ],
@@ -831,7 +893,7 @@ class _Cart extends ConsumerWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: _C.surface,
                     border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
                   ),
@@ -914,9 +976,9 @@ class _CartItemCard extends StatelessWidget {
                   GestureDetector(
                     onTap: () => item.quantity > 1 ? onQty(item.quantity - 1) : onRemove(),
                     child: SizedBox(
-                      width: 30, height: 30,
-                      child: Icon(item.quantity > 1 ? Icons.remove : Icons.delete_outline, size: 14,
-                          color: item.quantity > 1 ? _C.textSecondary : _C.red),
+                      width: 30,
+                      height: 30,
+                      child: Icon(item.quantity > 1 ? Icons.remove : Icons.delete_outline, size: 14, color: item.quantity > 1 ? _C.textSecondary : _C.red),
                     ),
                   ),
                   SizedBox(width: 26, child: Text('${item.quantity}', textAlign: TextAlign.center, style: _nu(size: 13, weight: FontWeight.w600))),
@@ -936,8 +998,6 @@ class _CartItemCard extends StatelessWidget {
 
 // ═════════════════════════════════════════════════════════
 // CHECKOUT — "Tudo certo para finalizar seu pedido?"
-// Purple header, order summary, items, address + edit.
-// Goes directly to NuPay (NO Contract Gate).
 // ═════════════════════════════════════════════════════════
 class _NuCheckout extends ConsumerWidget {
   const _NuCheckout();
@@ -971,15 +1031,15 @@ class _NuCheckout extends ConsumerWidget {
                         child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 22),
                       ),
                       Container(
-                        width: 32, height: 32,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white54, width: 1.5)),
                         child: const Icon(Icons.help_outline, color: Colors.white54, size: 18),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text('Tudo certo para\nfinalizar seu pedido?',
-                      style: _nu(size: 26, weight: FontWeight.w700, color: Colors.white, height: 1.2)),
+                  Text('Tudo certo para\nfinalizar seu pedido?', style: _nu(size: 26, weight: FontWeight.w700, height: 1.2)),
                 ],
               ),
             ),
@@ -990,7 +1050,7 @@ class _NuCheckout extends ConsumerWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  // Order summary
+                  // Resumo do pedido
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     padding: const EdgeInsets.all(20),
@@ -1020,7 +1080,7 @@ class _NuCheckout extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Divider(height: 1, color: _C.cardBorder),
+                        const Divider(height: 1, color: _C.cardBorder),
                         const SizedBox(height: 16),
                         Center(child: Text('Você pagará', style: _nu(size: 14, color: _C.textSecondary))),
                         const SizedBox(height: 4),
@@ -1043,8 +1103,7 @@ class _NuCheckout extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Chegará em 7 dias úteis por ${CurrencyFormat.format(shipping)}',
-                            style: _nu(size: 13, color: _C.textSecondary)),
+                        Text('Chegará em 7 dias úteis por ${CurrencyFormat.format(shipping)}', style: _nu(size: 13, color: _C.textSecondary)),
                         const SizedBox(height: 12),
                         ...items.map((item) => Padding(
                           padding: const EdgeInsets.only(bottom: 10),
@@ -1054,8 +1113,10 @@ class _NuCheckout extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(8),
                                 child: CachedNetworkImage(
                                   imageUrl: item.product.imageUrl,
-                                  width: 56, height: 56, fit: BoxFit.cover,
-                                  placeholder: (_, __) => Container(color: _C.bg, width: 56, height: 56),
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Container(color: _C.cardLight, width: 56, height: 56),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -1094,17 +1155,15 @@ class _NuCheckout extends ConsumerWidget {
                               Text('Endereço de entrega', style: _nu(size: 13, color: _C.textSecondary)),
                               const SizedBox(height: 4),
                               Text('Rua Topázio, 701', style: _nu(size: 15, weight: FontWeight.w600)),
-                              Text('São Paulo, SP', style: _nu(size: 13, color: _C.textTertiary)),
+                              Text('Complemento', style: _nu(size: 13, color: _C.textTertiary)),
                             ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            width: 40, height: 40,
-                            decoration: BoxDecoration(color: _C.purple.withOpacity(0.1), shape: BoxShape.circle),
-                            child: Icon(Icons.edit, color: _C.purple, size: 18),
-                          ),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(color: _C.purple.withValues(alpha: 0.15), shape: BoxShape.circle),
+                          child: const Icon(Icons.edit, color: _C.purpleLight, size: 18),
                         ),
                       ],
                     ),
@@ -1114,10 +1173,10 @@ class _NuCheckout extends ConsumerWidget {
               ),
             ),
           ),
-          // Bottom bar — goes directly to NuPay (NO contract gate)
+          // Bottom bar
           Container(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: _C.surface,
               border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
             ),
@@ -1136,7 +1195,7 @@ class _NuCheckout extends ConsumerWidget {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => _NuPay(total: grandTotal))),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => _ContractGate(total: grandTotal))),
                     style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
                     child: const Text('Ir para pagamento'),
                   ),
@@ -1151,10 +1210,174 @@ class _NuCheckout extends ConsumerWidget {
 }
 
 // ═════════════════════════════════════════════════════════
-// NuPay — Payment Screen
-// Only "À vista com saldo" + "Crédito" (Até 24x pill).
-// Installment grid: 1x/2x/3x/12x/24x + edit. Purple CTA.
-// NO Pix option. NO Contract Gate.
+// CONTRACT GATE — "Só pode continuar se baixar o contrato"
+// ═════════════════════════════════════════════════════════
+class _ContractGate extends StatefulWidget {
+  final double total;
+  const _ContractGate({required this.total});
+  @override
+  State<_ContractGate> createState() => _ContractGateState();
+}
+
+class _ContractGateState extends State<_ContractGate> {
+  bool _downloaded = false;
+  bool _accepted = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _C.bg,
+      appBar: AppBar(
+        backgroundColor: _C.surface,
+        foregroundColor: _C.textPrimary,
+        elevation: 0,
+        title: Text('Contrato', style: _nu(size: 18, weight: FontWeight.w600)),
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: _C.card,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: _C.cardBorder, width: 0.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(color: _C.purple.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+                        child: const Icon(Icons.description, color: _C.purple, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Contrato de Crédito', style: _nu(size: 16, weight: FontWeight.w600)),
+                            Text('Leia e baixe antes de continuar', style: _nu(size: 12, color: _C.textSecondary)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: _C.cardLight,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Termos e Condições', style: _nu(size: 14, weight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Este contrato estabelece os termos de uso do crédito pré-aprovado para compras parceladas. Taxa de juros: 1,99% a.m. CET: 26,82% a.a. O valor total será debitado da sua linha de crédito disponível.',
+                          style: _nu(size: 12, color: _C.textSecondary, height: 1.5),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => setState(() => _downloaded = true),
+                      icon: Icon(_downloaded ? Icons.check_circle : Icons.download, size: 18),
+                      label: Text(_downloaded ? 'Contrato baixado' : 'Baixar contrato'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _downloaded ? _C.green : _C.purple,
+                        side: BorderSide(color: _downloaded ? _C.green : _C.purple),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (_downloaded)
+              _Press(
+                onTap: () => setState(() => _accepted = !_accepted),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: _accepted ? _C.purple : Colors.transparent,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: _accepted ? _C.purple : _C.textTertiary, width: 2),
+                      ),
+                      child: _accepted ? const Icon(Icons.check, color: Colors.white, size: 16) : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Li e aceito os termos do contrato de crédito',
+                        style: _nu(size: 13, color: _C.textSecondary),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (!_downloaded)
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _C.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: _C.red, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Só pode continuar se baixar o contrato',
+                        style: _nu(size: 12, color: _C.red, weight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: (_downloaded && _accepted)
+                    ? () => Navigator.push(context, MaterialPageRoute(builder: (_) => _NuPay(total: widget.total)))
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  disabledBackgroundColor: _C.cardLight,
+                  disabledForegroundColor: _C.textTertiary,
+                ),
+                child: const Text('Continuar para pagamento'),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═════════════════════════════════════════════════════════
+// NuPay — Payment Screen (Screenshot 2)
 // ═════════════════════════════════════════════════════════
 class _NuPay extends ConsumerStatefulWidget {
   final double total;
@@ -1182,7 +1405,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: _C.surface,
               border: Border(bottom: BorderSide(color: _C.cardBorder, width: 0.5)),
             ),
@@ -1196,7 +1419,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: Icon(Icons.close, color: _C.textPrimary, size: 24),
+                        child: const Icon(Icons.close, color: _C.textPrimary, size: 24),
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -1225,7 +1448,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
               ),
             ),
           ),
-          // Payment Methods (NO Pix)
+          // Payment Methods
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -1245,8 +1468,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('À vista com saldo da conta', style: _nu(size: 15, weight: FontWeight.w500)),
-                              Text('${CurrencyFormat.format(user.nubankBalance)} de saldo disponível',
-                                  style: _nu(size: 13, color: _C.textSecondary)),
+                              Text('${CurrencyFormat.format(user.nubankBalance)} de saldo disponível', style: _nu(size: 13, color: _C.textSecondary)),
                             ],
                           ),
                         ),
@@ -1254,7 +1476,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Credit option (with Até 24x pill)
+                  // Credit option
                   _Press(
                     onTap: () => setState(() => _method = 'credit'),
                     child: Row(
@@ -1266,8 +1488,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Crédito', style: _nu(size: 15, weight: FontWeight.w500)),
-                              Text('${CurrencyFormat.format(user.nubankCreditAvailable)} de limite disponível',
-                                  style: _nu(size: 13, color: _C.textSecondary)),
+                              Text('${CurrencyFormat.format(user.nubankCreditAvailable)} de limite disponível', style: _nu(size: 13, color: _C.textSecondary)),
                             ],
                           ),
                         ),
@@ -1279,7 +1500,31 @@ class _NuPayState extends ConsumerState<_NuPay> {
                       ],
                     ),
                   ),
-                  // Installment grid (shown when credit selected)
+                  const SizedBox(height: 24),
+                  // Pix option
+                  _Press(
+                    onTap: () => setState(() => _method = 'pix'),
+                    child: Row(
+                      children: [
+                        _RadioDot(selected: _method == 'pix'),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Pix', style: _nu(size: 15, weight: FontWeight.w500)),
+                              Text('Aprovação imediata', style: _nu(size: 13, color: _C.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(color: _C.pix.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.pix, color: _C.pix, size: 18),
+                        ),
+                      ],
+                    ),
+                  ),
                   if (_method == 'credit') ...[
                     const SizedBox(height: 16),
                     _buildInstGrid(installmentOptions),
@@ -1291,7 +1536,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
           // CTA
           Container(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: _C.surface,
               border: Border(top: BorderSide(color: _C.cardBorder, width: 0.5)),
             ),
@@ -1302,7 +1547,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const _Success())),
                   style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-                  child: Text(_method == 'credit' ? 'Pagar no crédito em ${_installments}x' : 'Pagar com saldo'),
+                  child: Text(_method == 'credit' ? 'Pagar no crédito em ${_installments}x' : _method == 'pix' ? 'Pagar com Pix' : 'Pagar com saldo'),
                 ),
               ),
             ),
@@ -1324,8 +1569,8 @@ class _NuPayState extends ConsumerState<_NuPay> {
           return GestureDetector(
             onTap: () {},
             child: Container(
-              decoration: BoxDecoration(color: _C.bg, borderRadius: BorderRadius.circular(12)),
-              child: Center(child: Icon(Icons.edit, color: _C.textSecondary, size: 22)),
+              decoration: BoxDecoration(color: _C.cardLight, borderRadius: BorderRadius.circular(12)),
+              child: const Center(child: Icon(Icons.edit, color: _C.textSecondary, size: 22)),
             ),
           );
         }
@@ -1335,7 +1580,7 @@ class _NuPayState extends ConsumerState<_NuPay> {
           onTap: () => setState(() => _installments = e.key),
           child: Container(
             decoration: BoxDecoration(
-              color: selected ? _C.purple : _C.bg,
+              color: selected ? _C.purple : _C.cardLight,
               borderRadius: BorderRadius.circular(12),
               border: selected ? Border.all(color: _C.green, width: 1.5) : null,
             ),
@@ -1362,7 +1607,8 @@ class _RadioDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 24, height: 24,
+      width: 24,
+      height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: selected ? _C.purple : _C.textTertiary, width: 2),
@@ -1411,7 +1657,7 @@ class _SuccessState extends ConsumerState<_Success> with TickerProviderStateMixi
   Widget build(BuildContext context) {
     final total = ref.watch(cartTotalProvider);
     return Scaffold(
-      backgroundColor: _C.surface,
+      backgroundColor: _C.bg,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -1428,11 +1674,13 @@ class _SuccessState extends ConsumerState<_Success> with TickerProviderStateMixi
                   ScaleTransition(
                     scale: CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeOutBack),
                     child: Container(
-                      width: 110, height: 110,
-                      decoration: BoxDecoration(color: _C.purple.withOpacity(0.15), shape: BoxShape.circle),
+                      width: 110,
+                      height: 110,
+                      decoration: BoxDecoration(color: _C.purple.withValues(alpha: 0.15), shape: BoxShape.circle),
                       child: Center(
                         child: Container(
-                          width: 72, height: 72,
+                          width: 72,
+                          height: 72,
                           decoration: const BoxDecoration(color: _C.purple, shape: BoxShape.circle),
                           child: ScaleTransition(
                             scale: CurvedAnimation(parent: _checkCtrl, curve: Curves.elasticOut),
@@ -1451,13 +1699,12 @@ class _SuccessState extends ConsumerState<_Success> with TickerProviderStateMixi
                   children: [
                     Text('Pagamento confirmado!', style: _nu(size: 22, weight: FontWeight.w600)),
                     const SizedBox(height: 6),
-                    Text('Seu pedido foi processado com sucesso.',
-                        style: _nu(size: 14, color: _C.textSecondary), textAlign: TextAlign.center),
+                    Text('Seu pedido foi processado com sucesso.', style: _nu(size: 14, color: _C.textSecondary), textAlign: TextAlign.center),
                     const SizedBox(height: 24),
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: _C.bg,
+                        color: _C.card,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: _C.cardBorder, width: 0.5),
                       ),
@@ -1519,14 +1766,14 @@ class _ConfettiPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (progress == 0) return;
-    final colors = [_C.purple, _C.purpleLight, _C.green, const Color(0xFFFFC107)];
+    final colors = [_C.purple, _C.purpleLight, _C.green, _C.star, _C.pix];
     for (int i = 0; i < 20; i++) {
       final a = _rng.nextDouble() * 2 * pi;
       final d = 40 + _rng.nextDouble() * 80;
       final x = size.width / 2 + cos(a) * d * progress;
       final y = size.height / 2 + sin(a) * d * progress + 20 * progress * progress;
       final paint = Paint()
-        ..color = colors[i % colors.length].withOpacity(1 - progress)
+        ..color = colors[i % colors.length].withValues(alpha: 1 - progress)
         ..style = PaintingStyle.fill;
       final s = 3 + _rng.nextDouble() * 4;
       canvas.drawRRect(

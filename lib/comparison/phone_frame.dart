@@ -6,12 +6,14 @@ class PhoneFrame extends StatelessWidget {
   final Widget child;
   final String label;
   final String? subtitle;
+  final Widget? headerWidget;
 
   const PhoneFrame({
     super.key,
     required this.child,
     required this.label,
     this.subtitle,
+    this.headerWidget,
   });
 
   @override
@@ -40,6 +42,10 @@ class PhoneFrame extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+          ],
+          if (headerWidget != null) ...[
+            const SizedBox(height: 6),
+            headerWidget!,
           ],
           const SizedBox(height: 10),
           // ─── Phone Body ─────────────────────────────────

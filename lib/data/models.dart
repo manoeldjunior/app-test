@@ -127,6 +127,7 @@ class UserProfile {
   final double nubankCreditUsed;
   final String nubankTier;
 
+
   const UserProfile({
     required this.name,
     required this.email,
@@ -143,6 +144,7 @@ class UserProfile {
     this.nubankCreditLimit = 0,
     this.nubankCreditUsed = 0,
     this.nubankTier = 'Ultravioleta',
+
   });
 
   double get carneDigitalAvailable => carneDigitalLimit - carneDigitalUsed;
@@ -234,4 +236,11 @@ class BannerItem {
     this.subtitle,
     this.actionUrl,
   });
+}
+
+// ─── CDC User State (for A/B toggle across all V1 screens) ──
+enum CdcUserState {
+  naoLogado,   // Not logged in
+  preAprovado, // Pre-approved credit
+  ativo,       // Active credit line
 }
