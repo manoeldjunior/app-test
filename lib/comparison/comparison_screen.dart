@@ -17,6 +17,7 @@ import '../hybrids/hybrid_a.dart';
 import '../hybrids/hybrid_b.dart';
 import '../hybrids/hybrid_c.dart';
 import '../hybrids/v_agent_final.dart';
+import '../hybrids/v_final_input.dart';
 
 class ComparisonScreen extends StatelessWidget {
   const ComparisonScreen({super.key});
@@ -178,6 +179,14 @@ class _ComparisonPage extends StatelessWidget {
               child: const VAgentFinalApp(),
             ),
           ),
+          SizedBox(
+            width: 320,
+            child: PhoneFrame(
+              label: '★ Final',
+              subtitle: 'Nubank UX × ML Grid × MagaluPay CDC',
+              child: const VFinalInputApp(),
+            ),
+          ),
         ],
       ),
     );
@@ -245,6 +254,14 @@ class _ComparisonPage extends StatelessWidget {
             label: '★ V_Agent_Final',
             subtitle: 'Nubank Shell × ML Engine × Magalu',
             child: const VAgentFinalApp(),
+          ),
+        ),
+        SizedBox(
+          width: 300,
+          child: PhoneFrame(
+            label: '★ Final',
+            subtitle: 'Nubank UX × ML Grid × MagaluPay CDC',
+            child: const VFinalInputApp(),
           ),
         ),
       ],
