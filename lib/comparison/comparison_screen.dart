@@ -89,7 +89,7 @@ class _ComparisonPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Toque nas telas para navegar. V1 (Magalu) • V2 (ML) • V3 (Nubank) • Hybrids A-C • Final',
+                      'Toque nas telas para navegar. V1 (Magalu) • V2 (ML) • V3 (Nubank) • V_Agent • Final',
                       style: GoogleFonts.inter(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 11,
