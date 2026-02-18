@@ -13,9 +13,6 @@ import '../v1/v1_app.dart';
 import '../v2/v2_app.dart';
 import '../v3/v3_app.dart';
 import '../v1/v1_widgets.dart';
-import '../hybrids/hybrid_a.dart';
-import '../hybrids/hybrid_b.dart';
-import '../hybrids/hybrid_c.dart';
 import '../hybrids/v_agent_final.dart';
 import '../hybrids/v_final_input.dart';
 
@@ -150,30 +147,6 @@ class _ComparisonPage extends StatelessWidget {
           SizedBox(
             width: 320,
             child: PhoneFrame(
-              label: 'Hybrid A',
-              subtitle: 'Alta densidade • Pix Parcelado',
-              child: const HybridAApp(),
-            ),
-          ),
-          SizedBox(
-            width: 320,
-            child: PhoneFrame(
-              label: 'Hybrid B',
-              subtitle: 'Espaçoso • Limite Magalu',
-              child: const HybridBApp(),
-            ),
-          ),
-          SizedBox(
-            width: 320,
-            child: PhoneFrame(
-              label: 'Hybrid C',
-              subtitle: 'Balanceado • Crédito Rápido',
-              child: const HybridCApp(),
-            ),
-          ),
-          SizedBox(
-            width: 320,
-            child: PhoneFrame(
               label: '★ V_Agent_Final',
               subtitle: 'Nubank Shell × ML Engine × Magalu',
               child: const VAgentFinalApp(),
@@ -222,30 +195,6 @@ class _ComparisonPage extends StatelessWidget {
             label: 'Magalu × Nubank',
             subtitle: 'Elegância e fluidez premium',
             child: const V3App(),
-          ),
-        ),
-        SizedBox(
-          width: 300,
-          child: PhoneFrame(
-            label: 'Hybrid A',
-            subtitle: 'Alta densidade • Pix Parcelado',
-            child: const HybridAApp(),
-          ),
-        ),
-        SizedBox(
-          width: 300,
-          child: PhoneFrame(
-            label: 'Hybrid B',
-            subtitle: 'Espaçoso • Limite Magalu',
-            child: const HybridBApp(),
-          ),
-        ),
-        SizedBox(
-          width: 300,
-          child: PhoneFrame(
-            label: 'Hybrid C',
-            subtitle: 'Balanceado • Crédito Rápido',
-            child: const HybridCApp(),
           ),
         ),
         SizedBox(

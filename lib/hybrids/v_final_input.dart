@@ -24,7 +24,7 @@ const _text1 = Color(0xFF1A1A1A);
 const _text2 = Color(0xFF757575);
 const _text3 = Color(0xFFAAAAAA);
 const _radius = 16.0;
-const _creditLimit = 5000.0; // User's MagaluPay credit limit
+const _creditLimit = 2000.0; // User's MagaluPay credit limit
 
 // ─── ENTRY ───────────────────────────────────────────────
 class VFinalInputApp extends StatelessWidget {
